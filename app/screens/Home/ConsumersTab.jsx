@@ -8,7 +8,9 @@ import { useQuery } from '../../hooks/useQuery';
 import { SELECT_ALL_CONSUMERS } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
 
-export function ConsumersTab() {
+export function ConsumersTab({
+  navigation,
+}) {
 
   const { showErrorModal } = useErrorHandler();
 
@@ -56,7 +58,7 @@ export function ConsumersTab() {
   return (
     <View style={styles.viewContainer}>
       {isNilOrEmpty(consumers) ? renderEmptyState() : null}
-      <Fab />
+      <Fab onPress={() => navigation.navigate("AddUpdateConsumer")} />
     </View>
   );
 }
