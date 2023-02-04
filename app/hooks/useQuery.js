@@ -42,9 +42,11 @@ export function useQuery() {
       .then(res => setQueryState(prevState => ({
         ...prevState,
         data: res,
+        error: null,
       })))
       .catch(err => setQueryState(prevState => ({
         ...prevState,
+        data: null,
         error: err,
       })))
       .finally(() => setQueryState(prevState => ({
