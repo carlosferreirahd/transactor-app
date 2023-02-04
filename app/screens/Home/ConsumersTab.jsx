@@ -17,7 +17,6 @@ export function ConsumersTab({
 
   const { loading, error, data, executeQuery } = useQuery();
   const consumers = data?.rows?._array;
-  console.log({ consumers })
 
   const getAllConsumers = useCallback(() => {
     executeQuery({
