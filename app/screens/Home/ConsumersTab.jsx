@@ -2,6 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
+import { Fab } from '../../components/Fab/Fab';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useQuery } from '../../hooks/useQuery';
 import { SELECT_ALL_CONSUMERS } from '../../utils/queries';
@@ -55,6 +56,7 @@ export function ConsumersTab() {
   return (
     <View style={styles.viewContainer}>
       {isNilOrEmpty(consumers) ? renderEmptyState() : null}
+      <Fab />
     </View>
   );
 }
