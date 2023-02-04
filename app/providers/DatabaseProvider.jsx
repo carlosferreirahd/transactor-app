@@ -13,7 +13,7 @@ const DatabaseContextData = {
 
 const DatabaseContext = createContext(DatabaseContextData);
 
-const DATABASE_NAME = "transactor.sb";
+const DATABASE_NAME = "transactor.db";
 
 const CREATE_TABLES_QUERIES = [
   "CREATE TABLE IF NOT EXISTS consumers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, balance REAL DEFAULT 0 NOT NULL);",
