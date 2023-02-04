@@ -2,6 +2,7 @@ import React from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { useTheme } from './app/hooks/useTheme';
 import { Router } from './Router';
+import { DatabaseProvider } from './app/providers/DatabaseProvider';
 
 import 'react-native-gesture-handler';
 
@@ -11,7 +12,9 @@ export default function App() {
 
   return (
     <PaperProvider theme={theme}>
-      <Router />
+      <DatabaseProvider>
+        <Router />
+      </DatabaseProvider>
     </PaperProvider>
   );
 }
