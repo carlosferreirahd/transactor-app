@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
+import { ConsumersList } from '../../components/ConsumersList/ConsumersList';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Fab } from '../../components/Fab/Fab';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
@@ -47,6 +48,13 @@ export function ConsumersTab({
     />
   );
 
+  const renderConsumersList = () => (
+    <ConsumersList
+      consumers={consumers}
+      navigation={navigation}
+    />
+  );
+
   if (loading) {
     return (
       <View style={styles.viewContainer}>
@@ -57,7 +65,7 @@ export function ConsumersTab({
 
   return (
     <View style={styles.viewContainer}>
-      {isNilOrEmpty(consumers) ? renderEmptyState() : null}
+      {isNilOrEmpty(consumers) ? renderEmptyState() : renderConsumersList()}
       <Fab onPress={() => navigation.navigate("AddUpdateConsumer", {
         refetchConsumers: getAllConsumers,
       })} />
