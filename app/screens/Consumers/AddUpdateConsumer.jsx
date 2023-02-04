@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
+import { useFeedbackMessage } from '../../hooks/useFeedbackMessage';
 import { useQuery } from '../../hooks/useQuery';
 import { ADD_NEW_CONSUMER } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
@@ -16,6 +17,8 @@ export function AddUpdateConsumer({
   const [name, setName] = useState('');
 
   const { showErrorModal } = useErrorHandler();
+
+  const { showFeedbackMessage } = useFeedbackMessage();
 
   const {
     loading: addLoading,
@@ -38,6 +41,9 @@ export function AddUpdateConsumer({
   useEffect(() => {
     if (!isNilOrEmpty(addData)) {
       refetchConsumers();
+      showFeedbackMessage({
+        message: "Cliente inserido com sucesso!",
+      });
       navigation.goBack();
     }
   }, [addData]);
