@@ -6,7 +6,7 @@ export function ErrorModal({
   isVisible,
   title,
   description,
-  textButton,
+  buttonText,
   onButtonClick,
   onHideModal,
 }) {
@@ -46,7 +46,7 @@ export function ErrorModal({
         onPress={handleButtonClick}
         style={styles.button}
       >
-        {textButton || "Entendi"}
+        {buttonText || "Entendi"}
       </Button>
     </Modal>
   );

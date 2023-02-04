@@ -1,11 +1,13 @@
 import {
   createContext,
+  useCallback,
   useEffect,
   useState,
 } from 'react';
 import * as SQLite from 'expo-sqlite';
 import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 
 const DatabaseContextData = {
   db: undefined,
@@ -25,45 +27,51 @@ function DatabaseProvider({
 }) {
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(undefined);
+
+  const { showErrorModal } = useErrorHandler();
 
   const db = SQLite.openDatabase(DATABASE_NAME);
 
-  useEffect(() => {
-
-    async function createTables() {
-      return Promise.all(
-        CREATE_TABLES_QUERIES.map(
-          async (createQuery) => {
-            return new Promise((resolve, reject) => {
-              db.transaction(tx => {
-                tx.executeSql(
-                  createQuery,
-                  [],
-                  (tx, result) => {
-                    resolve(result);
-                  },
-                  (tx, err) => {
-                    reject(err);
-                  },
-                );
-              });
+  const createTables = useCallback(async () => {
+    return Promise.all(
+      CREATE_TABLES_QUERIES.map(
+        async (createQuery) => {
+          return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+              tx.executeSql(
+                createQuery,
+                [],
+                (tx, result) => {
+                  resolve(result);
+                },
+                (tx, err) => {
+                  reject(err);
+                },
+              );
             });
-          }
-        )
-      );
-    }
-
-    // start creating tables //
-    createTables()
-      .then((res) => console.log("-- DATABASE LOADED! --", res))
-      .catch((err) => {
-        console.log(err);
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-
+          });
+        }
+      )
+    );
   }, []);
+
+  const loadDatabase = useCallback(() => {
+    setLoading(true);
+    createTables()
+      .then(() => console.log("-- DATABASE LOADED! --"))
+      .catch(() => showErrorModal({
+        title: 'Erro ao carregar banco de dados',
+        description: 'Não foi possível gerar as tabelas do banco',
+        buttonText: 'Tentar novamente',
+        onButtonClick: loadDatabase,
+      }))
+      .finally(() => setLoading(false));
+  }, [createTables]);
+
+  // creating tables on app load //
+  useEffect(() => {
+    loadDatabase();
+  }, [loadDatabase]);
 
   if (loading) {
     return (
