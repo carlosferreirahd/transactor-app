@@ -16,7 +16,6 @@ export function ConsumersTab({
 
   const { loading, error, data, executeQuery } = useQuery();
   const consumers = data?.rows?._array;
-  console.log({ loading, error, data, consumers });
 
   const getAllConsumers = useCallback(() => {
     executeQuery({
@@ -58,7 +57,9 @@ export function ConsumersTab({
   return (
     <View style={styles.viewContainer}>
       {isNilOrEmpty(consumers) ? renderEmptyState() : null}
-      <Fab onPress={() => navigation.navigate("AddUpdateConsumer")} />
+      <Fab onPress={() => navigation.navigate("AddUpdateConsumer", {
+        refetchConsumers: getAllConsumers,
+      })} />
     </View>
   );
 }

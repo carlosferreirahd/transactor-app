@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, HelperText, Text, TextInput } from 'react-native-paper';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
+import { useQuery } from '../../hooks/useQuery';
+import { ADD_NEW_CONSUMER } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
 
 export function AddUpdateConsumer({
@@ -8,12 +11,52 @@ export function AddUpdateConsumer({
   navigation,
 }) {
 
-  const [consumerName, setConsumerName] = useState('');
+  const { refetchConsumers } = route.params;
 
-  const hasErrors = isNilOrEmpty(consumerName);
+  const [name, setName] = useState('');
+
+  const { showErrorModal } = useErrorHandler();
+
+  const {
+    loading: addLoading,
+    error: addError,
+    data: addData,
+    executeQuery: addQuery,
+  } = useQuery();
+
+  const addNewConsumer = useCallback((consumerName) => {
+    addQuery({
+      query: ADD_NEW_CONSUMER,
+      params: [consumerName],
+    });
+  }, [addQuery]);
+
+  const nameIsEmpty = isNilOrEmpty(name);
+  const isLoading = addLoading;
+
+  // handle success
+  useEffect(() => {
+    if (!isNilOrEmpty(addData)) {
+      refetchConsumers();
+      navigation.goBack();
+    }
+  }, [addData]);
+
+  // handle error
+  useEffect(() => {
+    if (!isNilOrEmpty(addError)) {
+      showErrorModal({
+        title: 'Erro ao adicionar novo cliente',
+        description: `Não foi possível adicionar o cliente "${name}" no momento`,
+        buttonText: 'Tentar novamente',
+      });
+    }
+  }, [addError]);
 
   function handleButtonClick() {
-    if (hasErrors) return;
+    if (nameIsEmpty) return;
+
+    addNewConsumer(name);
   }
 
   return (
@@ -24,17 +67,20 @@ export function AddUpdateConsumer({
       <TextInput
         label="Nome do cliente"
         mode="outlined"
-        value={consumerName}
-        onChangeText={text => setConsumerName(text)}
+        value={name}
+        disabled={isLoading}
+        onChangeText={text => setName(text)}
         left={<TextInput.Icon icon="account" />}
         style={styles.userInput}
       />
-      <HelperText type="info" visible={hasErrors}>
+      <HelperText type="info" visible={nameIsEmpty}>
         O nome deve ser preenchido
       </HelperText>
       <Button
         icon={"account-plus"}
         mode="contained"
+        loading={isLoading}
+        disabled={isLoading}
         style={styles.submitButton}
         onPress={handleButtonClick}
       >
