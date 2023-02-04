@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
+import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useQuery } from '../../hooks/useQuery';
 import { SELECT_ALL_CONSUMERS } from '../../utils/queries';
@@ -35,8 +37,32 @@ export function ConsumersTab() {
     }
   }, [error]);
 
+  const renderEmptyState = () => (
+    <EmptyState
+      icon="account-multiple-plus-outline"
+      description="Insira novos clientes"
+    />
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.viewContainer}>
+        <ActivityIndicator animating={true} size="large" />
+      </View>
+    );
+  }
+
   return (
-    <View>
+    <View style={styles.viewContainer}>
+      {isNilOrEmpty(consumers) ? renderEmptyState() : null}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  viewContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+});
