@@ -70,6 +70,12 @@ export function ConsumersListRow({
       description={renderConsumerBalance()}
       left={props => renderConsumerIcon()}
       right={props => renderUserActions()}
+      onPress={() => {
+        navigation.navigate("TransactionsDetails", {
+          consumerId: id,
+          consumerName: name,
+        });
+      }}
     />
   );
 }
