@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import { useConsumers } from '../../hooks/useConsumers';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useFeedbackMessage } from '../../hooks/useFeedbackMessage';
 import { useQuery } from '../../hooks/useQuery';
 import { ADD_NEW_CONSUMER, UPDATE_CONSUMER } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
+import { AddUpdateConsumerForm } from './AddUpdateConsumerForm';
 
 export function AddUpdateConsumer({
   route,
@@ -20,6 +19,10 @@ export function AddUpdateConsumer({
   const { showErrorModal } = useErrorHandler();
 
   const { showFeedbackMessage } = useFeedbackMessage();
+
+  const addConsumerToStore = useConsumers((state) => state.addConsumer);
+
+  const updateConsumerFromStore = useConsumers((state) => state.updateConsumer);
 
   const {
     loading: addLoading,
@@ -35,8 +38,9 @@ export function AddUpdateConsumer({
     executeQuery: updateQuery,
   } = useQuery();
 
-  const addConsumerToStore = useConsumers((state) => state.addConsumer);
-  const updateConsumerFromStore = useConsumers((state) => state.updateConsumer);
+  const nameIsEmpty = isNilOrEmpty(name);
+
+  const isLoading = addLoading || updateLoading;
 
   const addNewConsumer = useCallback((consumerName) => {
     addQuery({
@@ -58,9 +62,6 @@ export function AddUpdateConsumer({
       ],
     });
   }, [updateQuery]);
-
-  const nameIsEmpty = isNilOrEmpty(name);
-  const isLoading = addLoading || updateLoading;
 
   // handle success
   useEffect(() => {
@@ -124,48 +125,13 @@ export function AddUpdateConsumer({
   }
 
   return (
-    <View style={styles.viewContainer}>
-      <Text variant="headlineLarge">
-        {`${isUpdate ? "Atualizar" : "Adicionar"} Cliente`}
-      </Text>
-      <TextInput
-        label="Nome do cliente"
-        mode="outlined"
-        value={name}
-        disabled={isLoading}
-        onChangeText={text => setName(text)}
-        left={<TextInput.Icon icon="account" />}
-        style={styles.userInput}
-      />
-      <HelperText type="info" visible={nameIsEmpty}>
-        O nome deve ser preenchido
-      </HelperText>
-      <Button
-        icon={isUpdate ? "account-edit" : "account-plus"}
-        mode="contained"
-        loading={isLoading}
-        disabled={isLoading}
-        style={styles.submitButton}
-        onPress={handleButtonClick}
-      >
-        {`${isUpdate ? "Atualizar" : "Adicionar"}`}
-      </Button>
-    </View>
+    <AddUpdateConsumerForm
+      name={name}
+      setName={setName}
+      isUpdate={isUpdate}
+      isLoading={isLoading}
+      nameIsEmpty={nameIsEmpty}
+      handleButtonClick={handleButtonClick}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  viewContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 16,
-  },
-  userInput: {
-    marginTop: 16,
-  },
-  submitButton: {
-    width: 150,
-    marginTop: 16,
-    alignSelf: 'flex-end',
-  }
-});
