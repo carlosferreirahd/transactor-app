@@ -16,7 +16,7 @@ export function AddUpdateConsumer({
 
   const [name, setName] = useState(isUpdate ? route.params.consumerName : '');
 
-  const { showErrorModal } = useErrorHandler();
+  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
   const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
 

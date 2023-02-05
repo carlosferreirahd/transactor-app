@@ -29,7 +29,7 @@ function DatabaseProvider({
 
   const [loading, setLoading] = useState(true);
 
-  const { showErrorModal } = useErrorHandler();
+  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
   const db = SQLite.openDatabase(DATABASE_NAME);
 

@@ -1,13 +1,28 @@
-import { useContext } from "react";
-import { ErrorHandlerContext } from "../providers/ErrorHandlerProvider";
+import { create } from 'zustand';
 
-export function useErrorHandler() {
-  const context = useContext(ErrorHandlerContext);
-
-  if (!context) {
-    throw new Error('useErrorHandler must' +
-      ' be used within a ErrorHandlerProvider');
-  }
-
-  return context;
-}
+export const useErrorHandler = create((set) => ({
+  isVisible: false,
+  title: '',
+  description: '',
+  buttonText: '',
+  onButtonClick: () => null,
+  onHideModal: () => set({
+    isVisible: false,
+    title: '',
+    description: '',
+    buttonText: '',
+    onButtonClick: () => null,
+  }),
+  showErrorModal: ({
+    title,
+    description,
+    buttonText,
+    onButtonClick,
+  }) => set({
+    isVisible: true,
+    title: title,
+    description: description,
+    buttonText: buttonText,
+    onButtonClick: onButtonClick,
+  }),
+}));

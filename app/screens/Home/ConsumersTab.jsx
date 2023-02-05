@@ -19,7 +19,7 @@ export function ConsumersTab({
   const consumers = useConsumers((state) => state.consumers);
   const saveConsumersToStore = useConsumers((state) => state.saveConsumers);
 
-  const { showErrorModal } = useErrorHandler();
+  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
   const getAllConsumers = useCallback(() => {
     executeQuery({
