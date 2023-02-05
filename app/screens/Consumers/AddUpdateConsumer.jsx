@@ -18,7 +18,7 @@ export function AddUpdateConsumer({
 
   const { showErrorModal } = useErrorHandler();
 
-  const { showFeedbackMessage } = useFeedbackMessage();
+  const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
 
   const addConsumerToStore = useConsumers((state) => state.addConsumer);
 

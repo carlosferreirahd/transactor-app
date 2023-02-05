@@ -4,7 +4,7 @@ import { useTheme } from './app/hooks/useTheme';
 import { Router } from './Router';
 import { DatabaseProvider } from './app/providers/DatabaseProvider';
 import { ErrorHandlerProvider } from './app/providers/ErrorHandlerProvider';
-import { FeedbackMessageProvider } from './app/providers/FeedbackMessageProvider';
+import { FeedbackMessageContainer } from './app/components/FeedbackMessage/FeedbackMessageContainer';
 
 import 'react-native-gesture-handler';
 
@@ -15,11 +15,11 @@ export default function App() {
   return (
     <PaperProvider theme={theme}>
       <ErrorHandlerProvider>
-        <FeedbackMessageProvider>
+        <FeedbackMessageContainer>
           <DatabaseProvider>
             <Router />
           </DatabaseProvider>
-        </FeedbackMessageProvider>
+        </FeedbackMessageContainer>
       </ErrorHandlerProvider>
     </PaperProvider>
   );

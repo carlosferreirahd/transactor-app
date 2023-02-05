@@ -1,13 +1,14 @@
-import { useContext } from "react";
-import { FeedbackMessageContext } from "../providers/FeedbackMessageProvider";
+import { create } from 'zustand';
 
-export function useFeedbackMessage() {
-  const context = useContext(FeedbackMessageContext);
-
-  if (!context) {
-    throw new Error('useFeedbackMessage must' +
-      ' be used within a FeedbackMessageProvider');
-  }
-
-  return context;
-}
+export const useFeedbackMessage = create((set) => ({
+  isVisible: false,
+  message: '',
+  onHideSnackbar: () => set({
+    isVisible: false,
+    message: '',
+  }),
+  showFeedbackMessage: ({ message }) => set({
+    isVisible: true,
+    message: message,
+  }),
+}));
