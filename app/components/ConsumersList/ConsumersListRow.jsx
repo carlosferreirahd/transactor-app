@@ -50,6 +50,14 @@ export function ConsumersListRow({
       anchor={<IconButton icon="dots-horizontal" onPress={() => setActionsVisible(true)} />}
     >
       <Menu.Item
+        onPress={() => {
+          navigation.navigate("AddUpdateConsumer", {
+            consumerId: id,
+            consumerName: name,
+            consumerBalance: balance,
+          });
+          setActionsVisible(false);
+        }}
         title="Editar cliente"
         leadingIcon="pencil"
       />
