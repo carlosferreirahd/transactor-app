@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, HelperText, Text, TextInput } from 'react-native-paper';
+import { useConsumers } from '../../hooks/useConsumers';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useFeedbackMessage } from '../../hooks/useFeedbackMessage';
 import { useQuery } from '../../hooks/useQuery';
@@ -11,8 +12,6 @@ export function AddUpdateConsumer({
   route,
   navigation,
 }) {
-
-  const { refetchConsumers } = route.params;
 
   const [name, setName] = useState('');
 
@@ -27,6 +26,8 @@ export function AddUpdateConsumer({
     executeQuery: addQuery,
   } = useQuery();
 
+  const addConsumerToStore = useConsumers((state) => state.addConsumer);
+
   const addNewConsumer = useCallback((consumerName) => {
     addQuery({
       query: ADD_NEW_CONSUMER,
@@ -40,10 +41,20 @@ export function AddUpdateConsumer({
   // handle success
   useEffect(() => {
     if (!isNilOrEmpty(addData)) {
-      refetchConsumers();
       showFeedbackMessage({
         message: "Cliente inserido com sucesso!",
       });
+
+      const newId = addData?.insertId;
+
+      const addedConsumer = {
+        id: newId,
+        name: name,
+        balance: 0.0,
+      };
+
+      addConsumerToStore(addedConsumer);
+
       navigation.goBack();
     }
   }, [addData]);

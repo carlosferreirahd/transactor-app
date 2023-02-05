@@ -4,6 +4,7 @@ import { ActivityIndicator } from 'react-native-paper';
 import { ConsumersList } from '../../components/ConsumersList/ConsumersList';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Fab } from '../../components/Fab/Fab';
+import { useConsumers } from '../../hooks/useConsumers';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useQuery } from '../../hooks/useQuery';
 import { SELECT_ALL_CONSUMERS } from '../../utils/queries';
@@ -13,10 +14,12 @@ export function ConsumersTab({
   navigation,
 }) {
 
-  const { showErrorModal } = useErrorHandler();
-
   const { loading, error, data, executeQuery } = useQuery();
-  const consumers = data?.rows?._array;
+
+  const consumers = useConsumers((state) => state.consumers);
+  const saveConsumersToStore = useConsumers((state) => state.saveConsumers);
+
+  const { showErrorModal } = useErrorHandler();
 
   const getAllConsumers = useCallback(() => {
     executeQuery({
@@ -28,6 +31,14 @@ export function ConsumersTab({
   useEffect(() => {
     getAllConsumers();
   }, [getAllConsumers]);
+
+  useEffect(() => {
+    const fetchedConsumers = data?.rows?._array;
+
+    if (!isNilOrEmpty(fetchedConsumers)) {
+      saveConsumersToStore(fetchedConsumers);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (!isNilOrEmpty(error)) {
@@ -65,9 +76,7 @@ export function ConsumersTab({
   return (
     <View style={styles.viewContainer}>
       {isNilOrEmpty(consumers) ? renderEmptyState() : renderConsumersList()}
-      <Fab onPress={() => navigation.navigate("AddUpdateConsumer", {
-        refetchConsumers: getAllConsumers,
-      })} />
+      <Fab onPress={() => navigation.navigate("AddUpdateConsumer")} />
     </View>
   );
 }
