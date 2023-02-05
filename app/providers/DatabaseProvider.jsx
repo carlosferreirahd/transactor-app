@@ -8,6 +8,7 @@ import * as SQLite from 'expo-sqlite';
 import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { useErrorHandler } from '../hooks/useErrorHandler';
+import { CREATE_CONSUMERS_TABLE, CREATE_TRANSACTIONS_TABLE } from '../utils/queries';
 
 const DatabaseContextData = {
   db: undefined,
@@ -18,8 +19,8 @@ const DatabaseContext = createContext(DatabaseContextData);
 const DATABASE_NAME = "transactor.db";
 
 const CREATE_TABLES_QUERIES = [
-  "CREATE TABLE IF NOT EXISTS consumers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, balance REAL DEFAULT 0 NOT NULL);",
-  "CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, value REAL NOT NULL, datetime TEXT NOT NULL, consumerId INTEGER NOT NULL, FOREIGN KEY(consumerId) REFERENCES consumers(id));",
+  CREATE_CONSUMERS_TABLE,
+  CREATE_TRANSACTIONS_TABLE,
 ];
 
 function DatabaseProvider({
