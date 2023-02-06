@@ -8,18 +8,18 @@ import { isNilOrEmpty } from '../../utils/verifications';
 const transactions = [
   { id: 1, value: 45.20, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 2, value: 45.2, operationTime: "2023-02-06T23:12:39.555Z" },
-  { id: 3, value: -45.2, operationTime: "2023-02-06T23:12:39.555Z" },
+  { id: 3, value: -45.2, operationTime: "2023-02-06T23:29:47.801Z" },
   { id: 4, value: 45.2, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 5, value: -45.2, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 6, value: -45.2, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 7, value: 45.2, operationTime: "2023-02-06T23:12:39.555Z" },
-  { id: 8, value: 45.20, operationTime: "2023-02-06T23:12:39.555Z" },
+  { id: 8, value: 45.20, operationTime: "2023-02-06T23:29:47.801Z" },
   { id: 9, value: 45.2, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 10, value: -45.2, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 11, value: 45.2, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 12, value: -45.2, operationTime: "2023-02-06T23:12:39.555Z" },
   { id: 13, value: -45.2, operationTime: "2023-02-06T23:12:39.555Z" },
-  { id: 14, value: 45.2, operationTime: "2023-02-06T23:12:39.555Z" },
+  { id: 14, value: 45.2, operationTime: "2023-02-06T23:29:47.801Z" },
 ];
 
 export function TransactionsDetails({

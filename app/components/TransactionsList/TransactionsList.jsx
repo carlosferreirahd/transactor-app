@@ -11,15 +11,19 @@ export function TransactionsList({
   filterType,
 }) {
 
+  const sortedByDateTransactions = useMemo(() => {
+    return transactions.sort((a, b) => moment(b.operationTime).diff(a.operationTime));
+  }, [transactions]);
+
   const filteredTransactions = useMemo(() => {
-    if (filterType === 'all') return transactions;
+    if (filterType === 'all') return sortedByDateTransactions;
 
-    if (filterType === 'payments') return transactions.filter(t => t.value < 0.0);
+    if (filterType === 'payments') return sortedByDateTransactions.filter(t => t.value < 0.0);
 
-    if (filterType === 'purchases') return transactions.filter(t => t.value > 0.0);
+    if (filterType === 'purchases') return sortedByDateTransactions.filter(t => t.value > 0.0);
 
     return [];
-  }, [transactions, filterType]);
+  }, [sortedByDateTransactions, filterType]);
 
   function renderList() {
     if (isNilOrEmpty(filteredTransactions)) {
