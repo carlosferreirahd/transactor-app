@@ -43,7 +43,7 @@ export function TransactionsDetails({
       return (
         <EmptyState
           icon="currency-usd-off"
-          description="Adicione transações com o botão abaixo"
+          description={`Adicione transações com o botão "+" acima`}
         />
       );
     }
