@@ -3,12 +3,20 @@ import { IconButton, List, Menu, Text } from 'react-native-paper';
 import Currency from 'react-currency-formatter';
 import { TransactionTypeTag } from './TransactionTypeTag';
 import { StyleSheet, View } from 'react-native';
+import moment from 'moment';
 
 export function TransactionsListRow({
   transaction,
 }) {
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  const {
+    value,
+    operationTime,
+  } = transaction;
+
+  const formattedOperationTime = moment(operationTime).format('DD/MM/YYYY [às] HH:mm');
 
   const renderRightContent = () => (
     <Menu
@@ -38,14 +46,14 @@ export function TransactionsListRow({
             style={styles.titleText}
           >
             <Currency
-              quantity={transaction.value}
+              quantity={value}
               currency="BRL"
             />
           </Text>
-          <TransactionTypeTag type={transaction.value < 0.0 ? "payment" : "purchase"} />
+          <TransactionTypeTag type={value < 0.0 ? "payment" : "purchase"} />
         </View>
       }
-      description={() => <Text variant="titleMedium">{transaction.operationTime}</Text>}
+      description={() => <Text variant="titleMedium">{formattedOperationTime}</Text>}
       left={() => <List.Icon color="#5bc100" icon="currency-brl" />}
       right={() => renderRightContent()}
     />
