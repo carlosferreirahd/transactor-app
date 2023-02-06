@@ -30,7 +30,6 @@ export function EmptyState({
 const styles = StyleSheet.create({
   emptyStateContainer: {
     flex: 1,
-    backgroundColor: '#fff',
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: 100,
