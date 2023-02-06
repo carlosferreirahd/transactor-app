@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { HelperText, IconButton, Menu, Text, Tooltip } from 'react-native-paper';
+import { AddTransactionModal } from '../../components/AddTransactionModal/AddTransactionModal';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
 import { isNilOrEmpty } from '../../utils/verifications';
@@ -29,6 +30,7 @@ export function TransactionsDetails({
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('all'); // all, payments or purchases
+  const [addModalIsVisible, setAddModalIsVisible] = useState(false);
 
   const consumerId = route?.params?.consumerId;
   const consumerName = route?.params?.consumerName;
@@ -66,7 +68,7 @@ export function TransactionsDetails({
           <Tooltip title="Adicionar nova transação">
             <IconButton
               icon="plus"
-              onPress={() => console.log('Pressed')}
+              onPress={() => setAddModalIsVisible(true)}
             />
           </Tooltip>
           <Menu
@@ -106,6 +108,11 @@ export function TransactionsDetails({
         * Cliente: {consumerName}
       </HelperText>
       {renderTransactions()}
+      <AddTransactionModal
+        isVisible={addModalIsVisible}
+        consumerId={consumerId}
+        hideModal={() => setAddModalIsVisible(false)}
+      />
     </View>
   );
 }
