@@ -1,20 +1,71 @@
-import React, { useState } from 'react';
+import moment from 'moment';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, Modal, RadioButton, Text, TextInput } from 'react-native-paper';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
+import { useFeedbackMessage } from '../../hooks/useFeedbackMessage';
+import { useQuery } from '../../hooks/useQuery';
+import { ADD_NEW_TRANSACTION } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
 
 export function AddTransactionModal({
+  consumerId,
   isVisible,
   hideModal,
-  consumerId,
+  afterAddTransaction,
 }) {
 
   const [value, setValue] = useState('');
   const [type, setType] = useState('');
 
-  const valueHasError = isNilOrEmpty(value) || isNaN(value);
+  const valueHasError = isNilOrEmpty(value) || isNaN(value) || Number(value) <= 0.0;
   const typeHasError = isNilOrEmpty(type);
   const hasErrors = valueHasError || typeHasError;
+
+  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
+
+  const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
+
+  const {
+    loading: addLoading,
+    error: addError,
+    data: addData,
+    executeQuery: addQuery,
+  } = useQuery();
+
+  const addTransactionByConsumerId = useCallback((transactionValue, transactionType) => {
+    const finalValue = transactionType === "payment" ? Number(transactionValue) * -1 : Number(transactionValue);
+    const transactionDateTime = moment().format();
+
+    addQuery({
+      query: ADD_NEW_TRANSACTION,
+      params: [finalValue, transactionDateTime, consumerId],
+    });
+  }, [addQuery]);
+
+  useEffect(() => {
+    if (!isNilOrEmpty(addData)) {
+      showFeedbackMessage({
+        message: "Transação inserida com sucesso",
+      });
+
+      // TODO - PASS TO THIS FUNC THE VALUE TO BE ADDED TO CONSUMER BALANCE
+      if (afterAddTransaction) afterAddTransaction();
+
+      handleHideModal();
+    }
+  }, [addData]);
+
+  useEffect(() => {
+    if (!isNilOrEmpty(addError)) {
+      showErrorModal({
+        title: "Erro ao adicionar transação",
+        description: "Não foi possível adicionar esta transação no momento, tente novamente",
+        buttonText: "Tentar novamente",
+        onButtonClick: () => addTransactionByConsumerId(value),
+      });
+    }
+  }, [addError]);
 
   function handleHideModal() {
     setValue('');
@@ -26,14 +77,14 @@ export function AddTransactionModal({
   function handleButtonClick() {
     if (hasErrors) return;
 
-    console.log('value', value);
-    console.log('type', type);
+    addTransactionByConsumerId(value, type);
   }
 
   return (
     <Modal
       visible={isVisible}
       onDismiss={handleHideModal}
+      dismissable={!addLoading}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
@@ -45,6 +96,7 @@ export function AddTransactionModal({
       <TextInput
         label="Valor da transação"
         value={value}
+        disabled={addLoading}
         keyboardType="numeric"
         mode="outlined"
         onChangeText={(text) => {
@@ -70,17 +122,19 @@ export function AddTransactionModal({
         <RadioButton.Item
           label="Pagamento"
           value="payment"
+          disabled={addLoading}
         />
         <RadioButton.Item
           label="Compra"
           value="purchase"
+          disabled={addLoading}
         />
       </RadioButton.Group>
       <Button
         icon="plus-circle-outline"
         mode="contained"
-        // loading={isLoading}
-        // disabled={isLoading}
+        loading={addLoading}
+        disabled={addLoading}
         onPress={handleButtonClick}
         style={[styles.commonGap, styles.submitButton]}
       >

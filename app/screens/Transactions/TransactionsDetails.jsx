@@ -21,7 +21,7 @@ export function TransactionsDetails({
   const consumerId = route?.params?.consumerId;
   const consumerName = route?.params?.consumerName;
 
-  const { showErrorModal } = useErrorHandler((state) => state.showErrorModal);
+  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
   const {
     loading: selectLoading,
