@@ -89,10 +89,12 @@ export function AddUpdateConsumer({
       });
 
       const consumerId = route.params.consumerId;
+      const consumerBalance = route.params.consumerBalance;
 
       updateConsumerFromStore({
         consumerId,
         newConsumerName: name,
+        newConsumerBalance: consumerBalance,
       });
 
       navigation.goBack();

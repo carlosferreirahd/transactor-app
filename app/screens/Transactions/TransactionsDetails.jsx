@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator, HelperText, IconButton, Menu, Text, Tooltip } from 'react-native-paper';
+import Currency from 'react-currency-formatter';
 import { AddTransactionModal } from '../../components/AddTransactionModal/AddTransactionModal';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
@@ -8,18 +9,22 @@ import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useQuery } from '../../hooks/useQuery';
 import { SELECT_TRANSACTIONS_BY_CONSUMER_ID } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
+import { useConsumers } from '../../hooks/useConsumers';
 
 export function TransactionsDetails({
   route,
   navigation,
 }) {
 
+  const consumerId = route?.params?.consumerId;
+
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('all'); // all, payments or purchases
   const [addModalIsVisible, setAddModalIsVisible] = useState(false);
 
-  const consumerId = route?.params?.consumerId;
-  const consumerName = route?.params?.consumerName;
+  const consumers = useConsumers((state) => state.consumers);
+
+  const updateConsumerFromStore = useConsumers((state) => state.updateConsumer);
 
   const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
@@ -31,7 +36,6 @@ export function TransactionsDetails({
   } = useQuery();
 
   const transactions = selectData?.rows?._array;
-  console.log({ transactions });
 
   const getTransactionsByConsumerId = useCallback(() => {
     selectQuery({
@@ -43,6 +47,10 @@ export function TransactionsDetails({
   useEffect(() => {
     getTransactionsByConsumerId();
   }, [getTransactionsByConsumerId]);
+
+  const currentConsumerInfo = useMemo(() => {
+    return consumers.find(consumer => consumer.id === consumerId);
+  }, [consumers, consumerId]);
 
   useEffect(() => {
     if (!isNilOrEmpty(selectError)) {
@@ -58,6 +66,18 @@ export function TransactionsDetails({
   function handleFilterChange(filterChoice) {
     setSelectedFilter(filterChoice);
     setIsMenuVisible(false);
+  }
+
+  function handleAfterAddTransaction({ addedValue }) {
+    if (isNilOrEmpty(currentConsumerInfo)) return;
+
+    const finalValue = currentConsumerInfo.balance + addedValue;
+
+    updateConsumerFromStore({
+      consumerId,
+      newConsumerName: currentConsumerInfo.name,
+      newConsumerBalance: finalValue,
+    });
   }
 
   function renderTransactions() {
@@ -133,13 +153,21 @@ export function TransactionsDetails({
         </View>
       </View>
       <HelperText visible style={styles.consumerNameText}>
-        * Cliente: {consumerName}
+        * Cliente: {currentConsumerInfo.name || ""}
+      </HelperText>
+      <HelperText visible style={styles.consumerNameText}>
+        * Valor que o cliente deve: {' '}
+        <Currency
+          quantity={currentConsumerInfo.balance || 0}
+          currency="BRL"
+        />
       </HelperText>
       {renderTransactions()}
       <AddTransactionModal
         isVisible={addModalIsVisible}
         consumerId={consumerId}
         hideModal={() => setAddModalIsVisible(false)}
+        afterAddTransaction={handleAfterAddTransaction}
       />
     </View>
   );

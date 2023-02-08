@@ -73,7 +73,6 @@ export function ConsumersListRow({
       onPress={() => {
         navigation.navigate("TransactionsDetails", {
           consumerId: id,
-          consumerName: name,
         });
       }}
     />
