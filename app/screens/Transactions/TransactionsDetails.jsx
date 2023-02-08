@@ -71,6 +71,11 @@ export function TransactionsDetails({
   function handleAfterAddTransaction({ addedValue }) {
     if (isNilOrEmpty(currentConsumerInfo)) return;
 
+    // update balance in consumer table
+
+    // refresh transactions list
+    getTransactionsByConsumerId();
+
     const finalValue = currentConsumerInfo.balance + addedValue;
 
     updateConsumerFromStore({
@@ -100,7 +105,7 @@ export function TransactionsDetails({
 
   if (selectLoading) {
     return (
-      <View style={styles.viewContainer}>
+      <View style={[styles.viewContainer, styles.viewLoadingContainer]}>
         <ActivityIndicator animating={true} size="large" />
       </View>
     );
@@ -178,6 +183,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+  },
+  viewLoadingContainer: {
+    justifyContent: 'center',
   },
   headerContainer: {
     flexDirection: 'row',

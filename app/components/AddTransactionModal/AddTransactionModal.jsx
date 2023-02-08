@@ -51,9 +51,6 @@ export function AddTransactionModal({
 
       const addedValue = type === "payment" ? Number(value) * -1 : Number(value);
 
-      // TODO - PASS TO THIS FUNC THE VALUE TO BE ADDED TO CONSUMER BALANCE
-      // RULES: PAGAMENTO NÃO PODE SER MAIOR QUE O BALANCE (perguntar se pode ficar com balance negativo)
-      // APÓS UMA ADD DE TRANSAÇÃO, ATUALIZAR BALANCE DO CONSUMIDOR
       if (afterAddTransaction) afterAddTransaction({ addedValue });
 
       handleHideModal();
