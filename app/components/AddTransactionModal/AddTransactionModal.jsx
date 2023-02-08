@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, Modal, RadioButton, Text, TextInput } from 'react-native-paper';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
-import { useFeedbackMessage } from '../../hooks/useFeedbackMessage';
 import { useQuery } from '../../hooks/useQuery';
 import { ADD_NEW_TRANSACTION } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
@@ -24,8 +23,6 @@ export function AddTransactionModal({
 
   const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
-  const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
-
   const {
     loading: addLoading,
     error: addError,
@@ -45,9 +42,6 @@ export function AddTransactionModal({
 
   useEffect(() => {
     if (!isNilOrEmpty(addData)) {
-      showFeedbackMessage({
-        message: "Transação inserida com sucesso",
-      });
 
       const addedValue = type === "payment" ? Number(value) * -1 : Number(value);
 

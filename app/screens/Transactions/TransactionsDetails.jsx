@@ -6,8 +6,9 @@ import { AddTransactionModal } from '../../components/AddTransactionModal/AddTra
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
+import { useFeedbackMessage } from '../../hooks/useFeedbackMessage';
 import { useQuery } from '../../hooks/useQuery';
-import { SELECT_TRANSACTIONS_BY_CONSUMER_ID } from '../../utils/queries';
+import { SELECT_TRANSACTIONS_BY_CONSUMER_ID, UPDATE_CONSUMER } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
 import { useConsumers } from '../../hooks/useConsumers';
 
@@ -28,6 +29,8 @@ export function TransactionsDetails({
 
   const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
+  const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
+
   const {
     loading: selectLoading,
     error: selectError,
@@ -35,7 +38,20 @@ export function TransactionsDetails({
     executeQuery: selectQuery,
   } = useQuery();
 
+  const {
+    loading: updateConsumerLoading,
+    error: updateConsumerError,
+    data: updateConsumerData,
+    executeQuery: updateConsumerQuery,
+  } = useQuery();
+
   const transactions = selectData?.rows?._array;
+
+  const isLoading = selectLoading || updateConsumerLoading;
+
+  const currentConsumerInfo = useMemo(() => {
+    return consumers.find(consumer => consumer.id === consumerId);
+  }, [consumers, consumerId]);
 
   const getTransactionsByConsumerId = useCallback(() => {
     selectQuery({
@@ -44,13 +60,16 @@ export function TransactionsDetails({
     });
   }, [selectQuery]);
 
+  const updateConsumerInfo = useCallback(({ currentName, newBalance }) => {
+    updateConsumerQuery({
+      query: UPDATE_CONSUMER,
+      params: [currentName, newBalance, consumerId],
+    });
+  }, [updateConsumerQuery]);
+
   useEffect(() => {
     getTransactionsByConsumerId();
   }, [getTransactionsByConsumerId]);
-
-  const currentConsumerInfo = useMemo(() => {
-    return consumers.find(consumer => consumer.id === consumerId);
-  }, [consumers, consumerId]);
 
   useEffect(() => {
     if (!isNilOrEmpty(selectError)) {
@@ -61,7 +80,27 @@ export function TransactionsDetails({
         onButtonClick: getTransactionsByConsumerId,
       });
     }
-  }, [selectError]);
+
+    if (!isNilOrEmpty(updateConsumerError)) {
+      showErrorModal({
+        title: 'Erro ao atualizar o saldo do cliente',
+        description: 'Não foi possível atualizar os dados do cliente',
+        buttonText: 'Tentar novamente',
+        onButtonClick: () => updateConsumerInfo({
+          currentName: currentConsumerInfo.name,
+          newBalance: currentConsumerInfo.balace,
+        }),
+      });
+    }
+  }, [selectError, updateConsumerError]);
+
+  useEffect(() => {
+    if (!isNilOrEmpty(updateConsumerData)) {
+      showFeedbackMessage({
+        message: "Transação inserida com sucesso",
+      });
+    }
+  }, [updateConsumerData]);
 
   function handleFilterChange(filterChoice) {
     setSelectedFilter(filterChoice);
@@ -71,11 +110,6 @@ export function TransactionsDetails({
   function handleAfterAddTransaction({ addedValue }) {
     if (isNilOrEmpty(currentConsumerInfo)) return;
 
-    // update balance in consumer table
-
-    // refresh transactions list
-    getTransactionsByConsumerId();
-
     const finalValue = currentConsumerInfo.balance + addedValue;
 
     updateConsumerFromStore({
@@ -83,6 +117,15 @@ export function TransactionsDetails({
       newConsumerName: currentConsumerInfo.name,
       newConsumerBalance: finalValue,
     });
+
+    // update balance in consumer table
+    updateConsumerInfo({
+      currentName: currentConsumerInfo.name,
+      newBalance: finalValue,
+    });
+
+    // refresh transactions list
+    getTransactionsByConsumerId();
   }
 
   function renderTransactions() {
@@ -103,7 +146,7 @@ export function TransactionsDetails({
     );
   }
 
-  if (selectLoading) {
+  if (isLoading) {
     return (
       <View style={[styles.viewContainer, styles.viewLoadingContainer]}>
         <ActivityIndicator animating={true} size="large" />
