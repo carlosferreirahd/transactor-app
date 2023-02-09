@@ -97,7 +97,7 @@ export function TransactionsDetails({
   useEffect(() => {
     if (!isNilOrEmpty(updateConsumerData)) {
       showFeedbackMessage({
-        message: "Transação inserida com sucesso",
+        message: "Saldo do cliente atualizado com sucesso!",
       });
     }
   }, [updateConsumerData]);
@@ -107,10 +107,15 @@ export function TransactionsDetails({
     setIsMenuVisible(false);
   }
 
-  function handleAfterAddTransaction({ addedValue }) {
+  function handleAfterTransactionOperation({ addedValue }) {
+    function safeSum(a, b) {
+      return (a * 100 + b * 100) / 100;
+    }
+
     if (isNilOrEmpty(currentConsumerInfo)) return;
 
-    const finalValue = currentConsumerInfo.balance + addedValue;
+    const calculatedValue = safeSum(currentConsumerInfo.balance, addedValue);
+    const finalValue = isNaN(calculatedValue) ? 0.0 : calculatedValue;
 
     updateConsumerFromStore({
       consumerId,
@@ -142,6 +147,8 @@ export function TransactionsDetails({
       <TransactionsList
         transactions={transactions}
         filterType={selectedFilter}
+        canDelete
+        afterDeleteTransaction={handleAfterTransactionOperation}
       />
     );
   }
@@ -215,7 +222,7 @@ export function TransactionsDetails({
         isVisible={addModalIsVisible}
         consumerId={consumerId}
         hideModal={() => setAddModalIsVisible(false)}
-        afterAddTransaction={handleAfterAddTransaction}
+        afterAddTransaction={handleAfterTransactionOperation}
       />
     </View>
   );

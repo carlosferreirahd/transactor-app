@@ -9,6 +9,8 @@ import { TransactionsListRow } from './TransactionsListRow';
 export function TransactionsList({
   transactions,
   filterType,
+  canDelete = false,
+  afterDeleteTransaction,
 }) {
 
   const sortedByDateTransactions = useMemo(() => {
@@ -41,6 +43,8 @@ export function TransactionsList({
           <TransactionsListRow
             key={transaction.id}
             transaction={transaction}
+            canDelete={canDelete}
+            afterDeleteTransaction={afterDeleteTransaction}
           />
         ))}
       </ScrollView>
