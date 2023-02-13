@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, View } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { ProgressBar } from 'react-native-paper';
 import { FilterFab } from '../../components/FilterFab/FilterFab';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useQuery } from '../../hooks/useQuery';
 import { SELECT_ALL_TRANSACTIONS } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
+import { useIsFocused } from '@react-navigation/native';
 
 export function TransactionsTab() {
 
@@ -23,6 +23,8 @@ export function TransactionsTab() {
 
   const transactions = isNilOrEmpty(data?.rows?._array) ? [] : data?.rows?._array;
 
+  const isFocused = useIsFocused();
+
   const getAllTransactions = useCallback(() => {
     executeQuery({
       query: SELECT_ALL_TRANSACTIONS,
@@ -31,8 +33,10 @@ export function TransactionsTab() {
   }, [executeQuery]);
 
   useEffect(() => {
-    getAllTransactions();
-  }, [getAllTransactions]);
+    if (isFocused) {
+      getAllTransactions();
+    }
+  }, [getAllTransactions, isFocused]);
 
   useEffect(() => {
     if (!isNilOrEmpty(error)) {
@@ -66,23 +70,24 @@ export function TransactionsTab() {
     },
   ];
 
-  if (loading) {
-    return (
-      <View style={styles.viewContainer}>
-        <ActivityIndicator animating={true} size="large" />
-      </View>
-    );
-  }
+  const renderProgressLoading = () => (
+    <ProgressBar visible={loading} indeterminate />
+  );
+
+  const renderTransactionsList = () => (
+    <TransactionsList
+      transactions={transactions}
+      filterType={filterType}
+      canDelete={false}
+      clearBackground
+      showConsumerName
+    />
+  );
 
   return (
     <View style={styles.viewContainer}>
-      <TransactionsList
-        transactions={transactions}
-        filterType={filterType}
-        canDelete={false}
-        clearBackground
-        showConsumerName
-      />
+      {renderProgressLoading()}
+      {isNilOrEmpty(transactions) ? null : renderTransactionsList()}
       <FilterFab
         isOpen={isFilterFabOpen.open}
         actions={filterActions}
