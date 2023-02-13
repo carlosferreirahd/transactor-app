@@ -9,7 +9,9 @@ import { TransactionsListRow } from './TransactionsListRow';
 export function TransactionsList({
   transactions,
   filterType,
+  clearBackground = false,
   canDelete = false,
+  showConsumerName = false,
   afterDeleteTransaction,
 }) {
 
@@ -44,6 +46,7 @@ export function TransactionsList({
             key={transaction.id}
             transaction={transaction}
             canDelete={canDelete}
+            showConsumerName={showConsumerName}
             afterDeleteTransaction={afterDeleteTransaction}
           />
         ))}
@@ -55,12 +58,18 @@ export function TransactionsList({
     <View
       style={styles.fullContainer}
     >
-      <Surface
-        style={[styles.surfaceContainer, isNilOrEmpty(filteredTransactions) ? styles.fullContainer : {}]}
-        elevation={4}
-      >
-        {renderList()}
-      </Surface>
+      {clearBackground ? (
+        <View style={styles.clearContainer}>
+          {renderList()}
+        </View>
+      ) : (
+        <Surface
+          style={[styles.surfaceContainer, isNilOrEmpty(filteredTransactions) ? styles.fullContainer : {}]}
+          elevation={4}
+        >
+          {renderList()}
+        </Surface>
+      )}
     </View>
   );
 }
@@ -73,4 +82,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
   },
+  clearContainer: {
+    padding: 16,
+  }
 });
