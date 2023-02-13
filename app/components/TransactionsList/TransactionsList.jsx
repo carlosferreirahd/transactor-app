@@ -40,7 +40,7 @@ export function TransactionsList({
     }
 
     return (
-      <ScrollView>
+      <ScrollView style={clearBackground ? styles.clearContainer : {}}>
         {filteredTransactions.map(transaction => (
           <TransactionsListRow
             key={transaction.id}
@@ -54,22 +54,20 @@ export function TransactionsList({
     );
   }
 
+  function renderSurfaceList() {
+    return (
+      <Surface
+        style={[styles.surfaceContainer, isNilOrEmpty(filteredTransactions) ? styles.fullContainer : {}]}
+        elevation={4}
+      >
+        {renderList()}
+      </Surface>
+    );
+  }
+
   return (
-    <View
-      style={styles.fullContainer}
-    >
-      {clearBackground ? (
-        <View style={styles.clearContainer}>
-          {renderList()}
-        </View>
-      ) : (
-        <Surface
-          style={[styles.surfaceContainer, isNilOrEmpty(filteredTransactions) ? styles.fullContainer : {}]}
-          elevation={4}
-        >
-          {renderList()}
-        </Surface>
-      )}
+    <View style={styles.fullContainer}>
+      {clearBackground ? renderList() : renderSurfaceList()}
     </View>
   );
 }

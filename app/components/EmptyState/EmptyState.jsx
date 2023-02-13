@@ -18,7 +18,7 @@ export function EmptyState({
         style={styles.emptyStateAvatar}
       />
       <Text
-        variant="headlineLarge"
+        variant="headlineMedium"
         style={styles.emptyStateDescription}
       >
         {description}
