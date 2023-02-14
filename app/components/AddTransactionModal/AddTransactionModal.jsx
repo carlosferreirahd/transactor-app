@@ -32,7 +32,8 @@ export function AddTransactionModal({
   } = useQuery();
 
   const addTransactionByConsumerId = useCallback((transactionValue, transactionType) => {
-    const finalValue = transactionType === "payment" ? Number(transactionValue) * -1 : Number(transactionValue);
+    const signedValue = transactionType === "payment" ? Number(transactionValue) * -1 : Number(transactionValue);
+    const finalValue = parseInt(signedValue * 100);
     const transactionDateTime = moment().format();
 
     addQuery({
@@ -44,7 +45,8 @@ export function AddTransactionModal({
   useEffect(() => {
     if (!isNilOrEmpty(addData)) {
 
-      const addedValue = type === "payment" ? Number(value) * -1 : Number(value);
+      const signedValue = type === "payment" ? Number(value) * -1 : Number(value);
+      const addedValue = parseInt(signedValue * 100);
 
       if (afterAddTransaction) afterAddTransaction({ addedValue });
 

@@ -19,6 +19,8 @@ export function TransactionsDetailsView({
   const [selectedFilter, setSelectedFilter] = useState('all'); // all, payments or purchases
   const [addModalIsVisible, setAddModalIsVisible] = useState(false);
 
+  const correctedValue = (currentConsumerInfo.balance || 0) / 100;
+
   function handleFilterChange(filterChoice) {
     setSelectedFilter(filterChoice);
     setIsMenuVisible(false);
@@ -104,7 +106,7 @@ export function TransactionsDetailsView({
       <HelperText visible style={styles.consumerNameText}>
         * Valor que o cliente deve: {' '}
         <Currency
-          quantity={currentConsumerInfo.balance || 0.0}
+          quantity={correctedValue}
           currency="BRL"
         />
       </HelperText>

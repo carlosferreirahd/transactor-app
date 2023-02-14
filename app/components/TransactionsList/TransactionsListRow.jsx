@@ -103,6 +103,8 @@ export function TransactionsListRow({
     </>
   );
 
+  const correctedValue = value / 100;
+
   return (
     <List.Item
       title={
@@ -112,7 +114,7 @@ export function TransactionsListRow({
             style={styles.titleText}
           >
             <Currency
-              quantity={value}
+              quantity={correctedValue}
               currency="BRL"
             />
           </Text>

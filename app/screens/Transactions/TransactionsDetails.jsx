@@ -94,13 +94,10 @@ export function TransactionsDetails({
   }, [updateConsumerData]);
 
   function handleAfterTransactionOperation({ addedValue }) {
-    function safeSum(a, b) {
-      return (a * 100 + b * 100) / 100;
-    }
 
     if (isNilOrEmpty(currentConsumerInfo)) return;
 
-    const calculatedValue = safeSum(currentConsumerInfo.balance, addedValue);
+    const calculatedValue = currentConsumerInfo.balance + addedValue;
     const finalValue = isNaN(calculatedValue) ? 0.0 : calculatedValue;
 
     updateConsumerFromStore({
