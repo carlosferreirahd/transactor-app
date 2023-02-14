@@ -18,6 +18,8 @@ export function ConsumersListRow({
 
   const { id, name, balance } = consumer;
 
+  const treatedBalance = balance / 100;
+
   const renderConsumerName = () => (
     <Text
       variant="titleLarge"
@@ -31,7 +33,7 @@ export function ConsumersListRow({
       variant="titleSmall"
       style={styles.description}
     >
-      <Currency quantity={balance} currency="BRL" />
+      <Currency quantity={treatedBalance} currency="BRL" />
     </Text>
   );
 
