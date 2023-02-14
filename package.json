@@ -18,7 +18,6 @@
     "moment": "^2.29.4",
     "ramda": "^0.28.0",
     "react": "18.1.0",
-    "react-currency-formatter": "^1.1.0",
     "react-native": "0.70.5",
     "react-native-currency-input": "^1.1.0",
     "react-native-gesture-handler": "~2.8.0",

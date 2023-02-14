@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator, HelperText, IconButton, Menu, Text, Tooltip } from 'react-native-paper';
-import Currency from 'react-currency-formatter';
 import { AddTransactionModal } from '../../components/AddTransactionModal/AddTransactionModal';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
 import { isNilOrEmpty } from '../../utils/verifications';
+import { formatNumber } from 'react-native-currency-input';
 
 export function TransactionsDetailsView({
   consumerId,
@@ -19,7 +19,15 @@ export function TransactionsDetailsView({
   const [selectedFilter, setSelectedFilter] = useState('all'); // all, payments or purchases
   const [addModalIsVisible, setAddModalIsVisible] = useState(false);
 
-  const correctedValue = (currentConsumerInfo.balance || 0) / 100;
+  const treatedBalance = (currentConsumerInfo.balance || 0) / 100;
+
+  const formattedValue = formatNumber(treatedBalance, {
+    separator: ',',
+    prefix: 'R$ ',
+    precision: 2,
+    delimiter: '.',
+    signPosition: 'beforePrefix',
+  });
 
   function handleFilterChange(filterChoice) {
     setSelectedFilter(filterChoice);
@@ -104,11 +112,7 @@ export function TransactionsDetailsView({
         * Cliente: {currentConsumerInfo.name || ""}
       </HelperText>
       <HelperText visible style={styles.consumerNameText}>
-        * Valor que o cliente deve: {' '}
-        <Currency
-          quantity={correctedValue}
-          currency="BRL"
-        />
+        * Valor que o cliente deve: {formattedValue}
       </HelperText>
       {renderTransactions()}
       <AddTransactionModal

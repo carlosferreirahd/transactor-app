@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, HelperText, IconButton, List, Menu, Text } from 'react-native-paper';
-import Currency from 'react-currency-formatter';
+import { ActivityIndicator, IconButton, List, Menu, Text } from 'react-native-paper';
 import { TransactionTypeTag } from './TransactionTypeTag';
 import { StyleSheet, View } from 'react-native';
 import moment from 'moment';
@@ -9,6 +8,7 @@ import { isNilOrEmpty } from '../../utils/verifications';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { DELETE_TRANSACTION_BY_ID } from '../../utils/queries';
 import { useConsumers } from '../../hooks/useConsumers';
+import { formatNumber } from 'react-native-currency-input';
 
 export function TransactionsListRow({
   transaction,
@@ -25,6 +25,16 @@ export function TransactionsListRow({
     operationTime,
     consumerId,
   } = transaction;
+
+  const treatedBalance = value / 100;
+
+  const formattedValue = formatNumber(treatedBalance, {
+    separator: ',',
+    prefix: 'R$ ',
+    precision: 2,
+    delimiter: '.',
+    signPosition: 'beforePrefix',
+  });
 
   const consumers = useConsumers((state) => state.consumers);
 
@@ -103,8 +113,6 @@ export function TransactionsListRow({
     </>
   );
 
-  const correctedValue = value / 100;
-
   return (
     <List.Item
       title={
@@ -113,10 +121,7 @@ export function TransactionsListRow({
             variant="titleLarge"
             style={styles.titleText}
           >
-            <Currency
-              quantity={correctedValue}
-              currency="BRL"
-            />
+            {formattedValue}
           </Text>
           <TransactionTypeTag type={value < 0.0 ? "payment" : "purchase"} />
         </View>

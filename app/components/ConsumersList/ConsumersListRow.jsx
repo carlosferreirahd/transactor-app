@@ -7,7 +7,7 @@ import {
   IconButton,
   Menu,
 } from 'react-native-paper';
-import Currency from 'react-currency-formatter';
+import { formatNumber } from 'react-native-currency-input';
 
 export function ConsumersListRow({
   consumer,
@@ -19,6 +19,14 @@ export function ConsumersListRow({
   const { id, name, balance } = consumer;
 
   const treatedBalance = balance / 100;
+
+  const formattedValue = formatNumber(treatedBalance, {
+    separator: ',',
+    prefix: 'R$ ',
+    precision: 2,
+    delimiter: '.',
+    signPosition: 'beforePrefix',
+  });
 
   const renderConsumerName = () => (
     <Text
@@ -33,7 +41,7 @@ export function ConsumersListRow({
       variant="titleSmall"
       style={styles.description}
     >
-      <Currency quantity={treatedBalance} currency="BRL" />
+      {formattedValue}
     </Text>
   );
 
