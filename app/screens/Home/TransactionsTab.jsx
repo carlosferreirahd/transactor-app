@@ -71,7 +71,10 @@ export function TransactionsTab() {
   ];
 
   const renderProgressLoading = () => (
-    <ProgressBar visible={loading} indeterminate />
+    <ProgressBar
+      visible={loading}
+      indeterminate
+    />
   );
 
   const renderTransactionsList = () => (
@@ -87,7 +90,7 @@ export function TransactionsTab() {
   return (
     <View style={styles.viewContainer}>
       {renderProgressLoading()}
-      {isNilOrEmpty(transactions) ? null : renderTransactionsList()}
+      {renderTransactionsList()}
       <FilterFab
         isOpen={isFilterFabOpen.open}
         actions={filterActions}
@@ -101,6 +104,8 @@ const styles = StyleSheet.create({
   viewContainer: {
     flex: 1,
     backgroundColor: '#fff',
-    justifyContent: 'center',
   },
+  loadingContainer: {
+    flex: 1,
+  }
 });
