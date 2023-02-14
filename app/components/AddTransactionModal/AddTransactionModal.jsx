@@ -6,6 +6,7 @@ import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { useQuery } from '../../hooks/useQuery';
 import { ADD_NEW_TRANSACTION } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
+import CurrencyInput from 'react-native-currency-input';
 
 export function AddTransactionModal({
   consumerId,
@@ -14,7 +15,7 @@ export function AddTransactionModal({
   afterAddTransaction,
 }) {
 
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(0);
   const [type, setType] = useState('');
 
   const valueHasError = isNilOrEmpty(value) || isNaN(value) || Number(value) <= 0.0;
@@ -88,18 +89,24 @@ export function AddTransactionModal({
       >
         Adicionar Transação
       </Text>
-      <TextInput
-        label="Valor da transação"
+      <CurrencyInput
         value={value}
-        disabled={addLoading}
-        keyboardType="numeric"
-        mode="outlined"
-        onChangeText={(text) => {
-          const formattedValue = text.replace(/[^\d.]/g, '');
-          setValue(formattedValue);
-        }}
-        left={<TextInput.Icon icon="currency-brl" />}
-        style={styles.commonGap}
+        onChangeValue={setValue}
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0.0}
+        renderTextInput={textInputProps =>
+          <TextInput
+            {...textInputProps}
+            label="Valor da transação"
+            disabled={addLoading}
+            keyboardType="numeric"
+            mode="outlined"
+            left={<TextInput.Icon icon="currency-brl" />}
+            style={styles.commonGap}
+          />
+        }
       />
       <HelperText type="info" visible={true}>
         Digite o valor da transação
