@@ -1,6 +1,6 @@
 ## Visão Geral
 
-Transactor-app é uma aplicação em React Native de gerencionamento de clientes e transações. O aplicativo mantém uma lista de clientes, onde cada cliente é capaz de realizar compras e pagamentos com valores diversos, assim, o usuário pode armazenar e lembrar das transações de seus clientes.
+Transactor-app é uma aplicação em React Native de gerenciamento de clientes e transações. O aplicativo mantém uma lista de clientes, onde cada cliente é capaz de realizar compras e pagamentos com valores diversos, assim, o usuário pode armazenar e lembrar das transações de seus clientes.
 
 ### Funcionalidades
 
