@@ -8,7 +8,12 @@ import * as SQLite from 'expo-sqlite';
 import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { useErrorHandler } from '../hooks/useErrorHandler';
-import { CREATE_CONSUMERS_TABLE, CREATE_TRANSACTIONS_TABLE } from '../utils/queries';
+import {
+  CREATE_CONSUMERS_TABLE,
+  CREATE_TRANSACTIONS_TABLE,
+  UPDATE_CONSUMER_AFTER_ADD_TRANSACTION_TRIGGER,
+  UPDATE_CONSUMER_AFTER_DELETE_TRANSACTION_TRIGGER,
+} from '../utils/queries';
 
 const DatabaseContextData = {
   db: undefined,
@@ -21,6 +26,8 @@ const DATABASE_NAME = "transactor.db";
 const CREATE_TABLES_QUERIES = [
   CREATE_CONSUMERS_TABLE,
   CREATE_TRANSACTIONS_TABLE,
+  UPDATE_CONSUMER_AFTER_ADD_TRANSACTION_TRIGGER,
+  UPDATE_CONSUMER_AFTER_DELETE_TRANSACTION_TRIGGER,
 ];
 
 function DatabaseProvider({

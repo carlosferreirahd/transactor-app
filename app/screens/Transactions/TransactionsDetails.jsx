@@ -29,16 +29,9 @@ export function TransactionsDetails({
     executeQuery: selectQuery,
   } = useQuery();
 
-  const {
-    loading: updateConsumerLoading,
-    error: updateConsumerError,
-    data: updateConsumerData,
-    executeQuery: updateConsumerQuery,
-  } = useQuery();
-
   const transactions = selectData?.rows?._array;
 
-  const isLoading = selectLoading || updateConsumerLoading;
+  const isLoading = selectLoading;
 
   const currentConsumerInfo = useMemo(() => {
     return consumers.find(consumer => consumer.id === consumerId);
@@ -50,13 +43,6 @@ export function TransactionsDetails({
       params: [consumerId],
     });
   }, [selectQuery]);
-
-  const updateConsumerInfo = useCallback(({ currentName, newBalance }) => {
-    updateConsumerQuery({
-      query: UPDATE_CONSUMER,
-      params: [currentName, newBalance, consumerId],
-    });
-  }, [updateConsumerQuery]);
 
   useEffect(() => {
     getTransactionsByConsumerId();
@@ -71,34 +57,14 @@ export function TransactionsDetails({
         onButtonClick: getTransactionsByConsumerId,
       });
     }
-
-    if (!isNilOrEmpty(updateConsumerError)) {
-      showErrorModal({
-        title: 'Erro ao atualizar o saldo do cliente',
-        description: 'Não foi possível atualizar os dados do cliente',
-        buttonText: 'Tentar novamente',
-        onButtonClick: () => updateConsumerInfo({
-          currentName: currentConsumerInfo.name,
-          newBalance: currentConsumerInfo.balace,
-        }),
-      });
-    }
-  }, [selectError, updateConsumerError]);
-
-  useEffect(() => {
-    if (!isNilOrEmpty(updateConsumerData)) {
-      showFeedbackMessage({
-        message: "Saldo do cliente atualizado com sucesso!",
-      });
-    }
-  }, [updateConsumerData]);
+  }, [selectError]);
 
   function handleAfterTransactionOperation({ addedValue }) {
 
     if (isNilOrEmpty(currentConsumerInfo)) return;
 
     const calculatedValue = currentConsumerInfo.balance + addedValue;
-    const finalValue = isNaN(calculatedValue) ? 0.0 : calculatedValue;
+    const finalValue = isNaN(calculatedValue) ? 0 : calculatedValue;
 
     updateConsumerFromStore({
       consumerId,
@@ -106,10 +72,8 @@ export function TransactionsDetails({
       newConsumerBalance: finalValue,
     });
 
-    // update balance in consumer table
-    updateConsumerInfo({
-      currentName: currentConsumerInfo.name,
-      newBalance: finalValue,
+    showFeedbackMessage({
+      message: "Saldo do cliente atualizado com sucesso!",
     });
 
     // refresh transactions list

@@ -66,7 +66,7 @@ export function AddTransactionModal({
   }, [addError]);
 
   function handleHideModal() {
-    setValue('');
+    setValue(0);
     setType('');
 
     if (hideModal) hideModal();
