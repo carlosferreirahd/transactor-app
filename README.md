@@ -32,7 +32,7 @@ $ npx expo start
 
 Tecnologias utilizadas no desenvolvimento:
 
-- [SQlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) para persistência local de dados;
+- [SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/) para persistência local de dados;
 - [React Navigation](https://reactnavigation.org/) para gerenciar a navegação;
 - [React Native Paper](https://callstack.github.io/react-native-paper/) como `lib` de componentes, seguindo o Material Design da Google;
 - [Zustand](https://github.com/pmndrs/zustand) como `store` de gerenciamento de estados;
