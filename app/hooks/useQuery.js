@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react';
-import { useDatabase } from './useDatabase';
+import db from '../database/databaseInstance';
 import { isNilOrEmpty } from '../utils/verifications';
 
 export function useQuery() {
-  const { db } = useDatabase();
 
   const [queryState, setQueryState] = useState({
     loading: false,

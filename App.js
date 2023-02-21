@@ -2,9 +2,9 @@ import React from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { useTheme } from './app/hooks/useTheme';
 import { Router } from './Router';
-import { DatabaseProvider } from './app/providers/DatabaseProvider';
 import { ErrorHandlerContainer } from './app/components/ErrorModal/ErrorHandlerContainer';
 import { FeedbackMessageContainer } from './app/components/FeedbackMessage/FeedbackMessageContainer';
+import { DatabaseLoader } from './app/components/DatabaseLoader/DatabaseLoader';
 import moment from 'moment';
 
 import 'moment/locale/pt-br'
@@ -21,9 +21,9 @@ export default function App() {
     <PaperProvider theme={theme}>
       <ErrorHandlerContainer>
         <FeedbackMessageContainer>
-          <DatabaseProvider>
+          <DatabaseLoader>
             <Router />
-          </DatabaseProvider>
+          </DatabaseLoader>
         </FeedbackMessageContainer>
       </ErrorHandlerContainer>
     </PaperProvider>
