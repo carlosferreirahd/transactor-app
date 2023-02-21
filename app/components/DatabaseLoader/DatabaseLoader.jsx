@@ -26,13 +26,17 @@ export function DatabaseLoader({
 
   const loadDatabase = useCallback(() => {
     setLoadingDatabase(true);
+
     configDatabase()
       .then(() => {
+        // fetching all consumers from db, storing in useConsumers store
         fetchConsumers({
-          errorCallback: handleFetchConsumersError,
+          onFail: handleFetchConsumersError,
         });
+
+        // fetching all transactions from db, storing in useTransactions store
         fetchTransactions({
-          errorCallback: handleFetchTransactionsError,
+          onFail: handleFetchTransactionsError,
         });
       })
       .catch(() => showErrorModal({

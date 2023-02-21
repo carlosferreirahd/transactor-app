@@ -6,16 +6,16 @@ import { fetchAllConsumers } from '../database/consumersQueries';
 export const useConsumers = create((set) => ({
   consumers: [],
   fetchConsumersData: { loading: false, },
-  fetchConsumers: ({ successCallback, errorCallback }) => {
+  fetchConsumers: ({ onSuccess, onFail }) => {
     set({ fetchConsumersData: { loading: true } });
     fetchAllConsumers()
       .then((res) => {
         const consumersList = res?.rows?._array;
         set({ consumers: consumersList });
-        if (successCallback) successCallback();
+        if (onSuccess) onSuccess();
       })
       .catch((err) => {
-        if (errorCallback) errorCallback(err);
+        if (onFail) onFail(err);
       })
       .finally(() => set({ fetchConsumersData: { loading: false } }));
   },

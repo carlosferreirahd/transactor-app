@@ -6,16 +6,16 @@ import { fetchAllTransactions } from '../database/transactionsQueries';
 export const useTransactions = create((set) => ({
   transactions: [],
   fetchTransactionsData: { loading: false, },
-  fetchTransactions: ({ successCallback, errorCallback }) => {
+  fetchTransactions: ({ onSuccess, onFail }) => {
     set({ fetchTransactionsData: { loading: true } });
     fetchAllTransactions()
       .then((res) => {
         const transactionsList = res?.rows?._array;
         set({ transactions: transactionsList });
-        if (successCallback) successCallback();
+        if (onSuccess) onSuccess();
       })
       .catch((err) => {
-        if (errorCallback) errorCallback(err);
+        if (onFail) onFail(err);
       })
       .finally(() => set({ fetchTransactionsData: { loading: false } }));
   },

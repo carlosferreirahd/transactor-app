@@ -1,11 +1,12 @@
+import { queryRunner } from "./queryRunner";
 import {
   CREATE_CONSUMERS_TABLE,
   CREATE_TRANSACTIONS_TABLE,
   UPDATE_CONSUMER_AFTER_ADD_TRANSACTION_TRIGGER,
   UPDATE_CONSUMER_AFTER_DELETE_TRANSACTION_TRIGGER,
 } from "../utils/queries";
-import { queryRunner } from "./queryRunner";
 
+// creating tables and triggers
 const CONFIG_QUERIES = [
   CREATE_CONSUMERS_TABLE,
   CREATE_TRANSACTIONS_TABLE,
