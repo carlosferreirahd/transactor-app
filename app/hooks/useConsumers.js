@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   addConsumerToDb,
   fetchAllConsumersFromDb,
+  updateConsumerFromDb,
 } from '../database/consumersQueries';
 
 // consumers state store
@@ -10,6 +11,7 @@ export const useConsumers = create((set) => ({
   consumers: [],
   fetchConsumersData: { loading: false, },
   addConsumerData: { loading: false },
+  updateConsumerData: { loading: false },
   fetchConsumers: ({ onSuccess, onFail }) => {
     set({ fetchConsumersData: { loading: true } });
 
@@ -46,17 +48,30 @@ export const useConsumers = create((set) => ({
       })
       .finally(() => set({ addConsumerData: { loading: false } }));
   },
-  updateConsumer: ({ consumerId, newConsumerName, newConsumerBalance }) => set((state) => ({
-    consumers: state.consumers.map(c => {
-      if (c.id === consumerId) {
-        return {
-          id: consumerId,
-          name: newConsumerName,
-          balance: newConsumerBalance,
-        }
-      } else {
-        return c;
-      }
-    }),
-  })),
+  updateConsumer: ({ consumerNewData, onSuccess, onFail }) => {
+    set({ updateConsumerData: { loading: true } });
+
+    updateConsumerFromDb({ consumerNewData })
+      .then(() => {
+        set((state) => ({
+          consumers: state.consumers.map(c => {
+            if (c.id === consumerNewData.id) {
+              return {
+                id: consumerNewData.id,
+                name: consumerNewData.name,
+                balance: consumerNewData.balance,
+              }
+            } else {
+              return c;
+            }
+          }),
+        }))
+
+        if (onSuccess) onSuccess();
+      })
+      .catch((err) => {
+        if (onFail) onFail(err);
+      })
+      .finally(() => set({ updateConsumerData: { loading: false } }));
+  },
 }));

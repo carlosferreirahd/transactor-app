@@ -13,7 +13,7 @@ export function AddUpdateConsumerForm({
   isUpdate,
   isLoading,
   nameIsEmpty,
-  handleButtonClick,
+  handleSubmit,
 }) {
 
   return (
@@ -37,9 +37,9 @@ export function AddUpdateConsumerForm({
         icon={isUpdate ? "account-edit" : "account-plus"}
         mode="contained"
         loading={isLoading}
-        disabled={isLoading}
+        disabled={isLoading || nameIsEmpty}
         style={styles.submitButton}
-        onPress={handleButtonClick}
+        onPress={handleSubmit}
       >
         {`${isUpdate ? "Atualizar" : "Adicionar"}`}
       </Button>
