@@ -1,13 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ProgressBar } from 'react-native-paper';
 import { FilterFab } from '../../components/FilterFab/FilterFab';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
-import { useErrorHandler } from '../../hooks/useErrorHandler';
-import { useQuery } from '../../hooks/useQuery';
-import { SELECT_ALL_TRANSACTIONS } from '../../utils/queries';
-import { isNilOrEmpty } from '../../utils/verifications';
-import { useIsFocused } from '@react-navigation/native';
+import { useTransactions } from '../../hooks/useTransactions';
 
 export function TransactionsTab() {
 
@@ -17,37 +12,7 @@ export function TransactionsTab() {
 
   const [filterType, setFilterType] = useState('all');
 
-  const { loading, error, data, executeQuery } = useQuery();
-
-  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
-
-  const transactions = isNilOrEmpty(data?.rows?._array) ? [] : data?.rows?._array;
-
-  const isFocused = useIsFocused();
-
-  const getAllTransactions = useCallback(() => {
-    executeQuery({
-      query: SELECT_ALL_TRANSACTIONS,
-      params: [],
-    });
-  }, [executeQuery]);
-
-  useEffect(() => {
-    if (isFocused) {
-      getAllTransactions();
-    }
-  }, [getAllTransactions, isFocused]);
-
-  useEffect(() => {
-    if (!isNilOrEmpty(error)) {
-      showErrorModal({
-        title: 'Erro ao buscar transações',
-        description: 'Não foi possível selecionar as transações do banco de dados',
-        buttonText: 'Tentar novamente',
-        onButtonClick: getAllTransactions,
-      });
-    }
-  }, [error]);
+  const transactions = useTransactions((state) => state.transactions);
 
   const filterActions = [
     {
@@ -70,27 +35,15 @@ export function TransactionsTab() {
     },
   ];
 
-  const renderProgressLoading = () => (
-    <ProgressBar
-      visible={loading}
-      indeterminate
-    />
-  );
-
-  const renderTransactionsList = () => (
-    <TransactionsList
-      transactions={transactions}
-      filterType={filterType}
-      canDelete={false}
-      clearBackground
-      showConsumerName
-    />
-  );
-
   return (
     <View style={styles.viewContainer}>
-      {renderProgressLoading()}
-      {renderTransactionsList()}
+      <TransactionsList
+        transactions={transactions}
+        filterType={filterType}
+        canDelete={false}
+        clearBackground
+        showConsumerName
+      />
       <FilterFab
         isOpen={isFilterFabOpen.open}
         actions={filterActions}

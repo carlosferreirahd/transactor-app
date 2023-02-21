@@ -4,6 +4,7 @@ import { ActivityIndicator } from 'react-native-paper';
 import { configDatabase } from '../../database/configDatabase';
 import { useConsumers } from '../../hooks/useConsumers';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
+import { useTransactions } from '../../hooks/useTransactions';
 
 export function DatabaseLoader({
   children,
@@ -13,11 +14,15 @@ export function DatabaseLoader({
 
   const fetchConsumers = useConsumers((state) => state.fetchConsumers);
 
+  const fetchTransactions = useTransactions((state) => state.fetchTransactions);
+
   const { loading: fetchConsumersLoading } = useConsumers((state) => state.fetchConsumersData);
+
+  const { loading: fetchTransactionsLoading } = useTransactions((state) => state.fetchTransactionsData);
 
   const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
-  const isLoading = loadingDatabase || fetchConsumersLoading;
+  const isLoading = loadingDatabase || fetchConsumersLoading || fetchTransactionsLoading;
 
   const loadDatabase = useCallback(() => {
     setLoadingDatabase(true);
@@ -25,6 +30,9 @@ export function DatabaseLoader({
       .then(() => {
         fetchConsumers({
           errorCallback: handleFetchConsumersError,
+        });
+        fetchTransactions({
+          errorCallback: handleFetchTransactionsError,
         });
       })
       .catch(() => showErrorModal({
@@ -41,7 +49,16 @@ export function DatabaseLoader({
       title: 'Erro ao buscar clientes',
       description: 'Não foi possível buscar a lista de clientes no banco de dados',
       buttonText: 'Tentar novamente',
-      onButtonClick: loadDatabase,
+      onButtonClick: loadDatabase, // retry
+    });
+  }
+
+  function handleFetchTransactionsError() {
+    showErrorModal({
+      title: 'Erro ao buscar transações',
+      description: 'Não foi possível selecionar as transações do banco de dados',
+      buttonText: 'Tentar novamente',
+      onButtonClick: loadDatabase, // retry
     });
   }
 
