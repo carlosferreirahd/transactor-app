@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   addTransactionToDb,
   fetchAllTransactionsFromDb,
+  removeTransactionFromDb,
 } from '../database/transactionsQueries';
 
 // transations state store
@@ -45,5 +46,21 @@ export const useTransactions = create((set) => ({
         if (onFail) onFail(err);
       })
       .finally(() => set({ addTransactionData: { loading: false } }));
+  },
+  removeTransaction: ({ id, onSuccess, onFail, onFinally }) => {
+    removeTransactionFromDb({ id })
+      .then(() => {
+        set((state) => ({
+          transactions: state.transactions.filter(transaction => transaction.id !== id),
+        }));
+
+        if (onSuccess) onSuccess();
+      })
+      .catch((err) => {
+        if (onFail) onFail(err);
+      })
+      .finally(() => {
+        if (onFinally) onFinally();
+      });
   },
 }));

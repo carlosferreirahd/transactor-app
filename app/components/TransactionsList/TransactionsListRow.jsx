@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, IconButton, List, Menu, Text } from 'react-native-paper';
 import { TransactionTypeTag } from './TransactionTypeTag';
 import { StyleSheet, View } from 'react-native';
-import moment from 'moment';
-import { useQuery } from '../../hooks/useQuery';
 import { isNilOrEmpty } from '../../utils/verifications';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
-import { DELETE_TRANSACTION_BY_ID } from '../../utils/queries';
 import { useConsumers } from '../../hooks/useConsumers';
 import { formatNumber } from 'react-native-currency-input';
+import { useTransactions } from '../../hooks/useTransactions';
+import moment from 'moment';
 
 export function TransactionsListRow({
   transaction,
@@ -18,6 +17,8 @@ export function TransactionsListRow({
 }) {
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const {
     id,
@@ -36,48 +37,44 @@ export function TransactionsListRow({
     signPosition: 'beforePrefix',
   });
 
+  const formattedOperationTime = moment(operationTime).format('DD/MM/YYYY [às] HH:mm');
+
   const consumers = useConsumers((state) => state.consumers);
+
+  const removeTransaction = useTransactions((state) => state.removeTransaction);
 
   const showErrorModal = useErrorHandler((state) => state.showErrorModal);
 
   const consumerName = useMemo(() => {
-    const findConsumer = (consumers || []).find(consumer => consumer.id === consumerId);
+    if (!showConsumerName) return "";
+
+    const findConsumer = consumers.find(consumer => consumer.id === consumerId);
     if (!isNilOrEmpty(findConsumer)) return findConsumer.name;
     else return "";
-  }, [consumers]);
+  }, [consumers, showConsumerName]);
 
-  const {
-    loading: deleteLoading,
-    error: deleteError,
-    data: deleteData,
-    executeQuery: deleteQuery,
-  } = useQuery();
+  function handleRemoveSuccess() {
+    const valueCorrection = value * -1;
+    afterDeleteTransaction({ addedValue: valueCorrection });
+  }
 
-  const deleteTransaction = useCallback(() => {
-    deleteQuery({
-      query: DELETE_TRANSACTION_BY_ID,
-      params: [id],
+  function handleRemoveError() {
+    showErrorModal({
+      title: 'Erro ao deletar transação',
+      description: 'Não foi possível deletar esta transação, tente novamente mais tarde',
+      buttonText: 'Entendi',
     });
-  }, [deleteQuery]);
+  }
 
-  useEffect(() => {
-    if (!isNilOrEmpty(deleteError)) {
-      showErrorModal({
-        title: 'Erro ao deletar transação',
-        description: 'Não foi possível deletar esta transação, tente novamente mais tarde',
-        buttonText: 'Entendi',
-      });
-    }
-  }, [deleteError]);
-
-  useEffect(() => {
-    if (!isNilOrEmpty(deleteData) && afterDeleteTransaction) {
-      const valueCorrection = value * -1;
-      afterDeleteTransaction({ addedValue: valueCorrection });
-    }
-  }, [deleteData]);
-
-  const formattedOperationTime = moment(operationTime).format('DD/MM/YYYY [às] HH:mm');
+  function handleDeleteTransaction() {
+    setDeleteLoading(true);
+    removeTransaction({
+      id: id,
+      onSuccess: handleRemoveSuccess,
+      onFail: handleRemoveError,
+      onFinally: () => setDeleteLoading(false),
+    });
+  }
 
   const renderMenu = () => (
     <Menu
@@ -92,7 +89,7 @@ export function TransactionsListRow({
     >
       <Menu.Item
         title="Excluir"
-        onPress={deleteTransaction}
+        onPress={handleDeleteTransaction}
         leadingIcon="delete"
       />
     </Menu>
