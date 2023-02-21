@@ -16,20 +16,15 @@ export function AddUpdateConsumer({
 
   const [name, setName] = useState(isUpdate ? route.params.consumerName : '');
 
-  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
+  const addConsumer = useConsumers((state) => state.addConsumer);
 
-  const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
-
-  const addConsumerToStore = useConsumers((state) => state.addConsumer);
+  const { loading: addConsumerLoading } = useConsumers((state) => state.addConsumerData);
 
   const updateConsumerFromStore = useConsumers((state) => state.updateConsumer);
 
-  const {
-    loading: addLoading,
-    error: addError,
-    data: addData,
-    executeQuery: addQuery,
-  } = useQuery();
+  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
+
+  const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
 
   const {
     loading: updateLoading,
@@ -40,14 +35,23 @@ export function AddUpdateConsumer({
 
   const nameIsEmpty = isNilOrEmpty(name);
 
-  const isLoading = addLoading || updateLoading;
+  const isLoading = addConsumerLoading || updateLoading;
 
-  const addNewConsumer = useCallback((consumerName) => {
-    addQuery({
-      query: ADD_NEW_CONSUMER,
-      params: [consumerName],
+  function handleAddConsumerSuccess() {
+    showFeedbackMessage({
+      message: "Cliente inserido com sucesso!",
     });
-  }, [addQuery]);
+
+    navigation.goBack();
+  }
+
+  function handleAddConsumerError() {
+    showErrorModal({
+      title: 'Erro ao adicionar novo cliente',
+      description: `Não foi possível adicionar o cliente "${name}" no momento`,
+      buttonText: 'Tentar novamente',
+    });
+  }
 
   const updateConsumer = useCallback((consumerName) => {
     const consumerId = route.params.consumerId;
@@ -65,24 +69,6 @@ export function AddUpdateConsumer({
 
   // handle success
   useEffect(() => {
-    if (!isNilOrEmpty(addData) && !isUpdate) {
-      showFeedbackMessage({
-        message: "Cliente inserido com sucesso!",
-      });
-
-      const newId = addData?.insertId;
-
-      const addedConsumer = {
-        id: newId,
-        name: name,
-        balance: 0.0,
-      };
-
-      addConsumerToStore(addedConsumer);
-
-      navigation.goBack();
-    }
-
     if (!isNilOrEmpty(updateData) && isUpdate) {
       showFeedbackMessage({
         message: "Cliente atualizado com sucesso!",
@@ -99,18 +85,10 @@ export function AddUpdateConsumer({
 
       navigation.goBack();
     }
-  }, [addData, updateData, isUpdate]);
+  }, [updateData, isUpdate]);
 
   // handle error
   useEffect(() => {
-    if (!isNilOrEmpty(addError) && !isUpdate) {
-      showErrorModal({
-        title: 'Erro ao adicionar novo cliente',
-        description: `Não foi possível adicionar o cliente "${name}" no momento`,
-        buttonText: 'Tentar novamente',
-      });
-    }
-
     if (!isNilOrEmpty(updateError) && isUpdate) {
       showErrorModal({
         title: 'Erro ao atualizar dados do cliente',
@@ -118,12 +96,20 @@ export function AddUpdateConsumer({
         buttonText: 'Tentar novamente',
       });
     }
-  }, [addError, updateError, isUpdate]);
+  }, [updateError, isUpdate]);
 
   function handleButtonClick() {
     if (nameIsEmpty) return;
 
-    isUpdate ? updateConsumer(name) : addNewConsumer(name);
+    if (isUpdate) {
+      updateConsumer(name);
+    } else {
+      addConsumer({
+        newConsumerName: name,
+        onSuccess: handleAddConsumerSuccess,
+        onFail: handleAddConsumerError,
+      });
+    }
   }
 
   return (
