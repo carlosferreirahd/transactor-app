@@ -6,6 +6,7 @@ import { SELECT_TRANSACTIONS_BY_CONSUMER_ID, UPDATE_CONSUMER } from '../../utils
 import { isNilOrEmpty } from '../../utils/verifications';
 import { useConsumers } from '../../hooks/useConsumers';
 import { TransactionsDetailsView } from './TransactionsDetailsView';
+import { useTransactions } from '../../hooks/useTransactions';
 
 export function TransactionsDetails({
   route,
@@ -14,70 +15,33 @@ export function TransactionsDetails({
 
   const consumerId = route?.params?.consumerId;
 
-  const consumers = useConsumers((state) => state.consumers);
+  const allConsumers = useConsumers((state) => state.consumers);
 
-  const updateConsumerFromStore = useConsumers((state) => state.updateConsumer);
+  const allTransactions = useTransactions((state) => state.transactions);
 
-  const showErrorModal = useErrorHandler((state) => state.showErrorModal);
+  const addToBalanceById = useConsumers((state) => state.addToBalanceById);
+
+  const { loading: isLoading } = useTransactions((state) => state.fetchTransactionsData);
 
   const showFeedbackMessage = useFeedbackMessage((state) => state.showFeedbackMessage);
 
-  const {
-    loading: selectLoading,
-    error: selectError,
-    data: selectData,
-    executeQuery: selectQuery,
-  } = useQuery();
-
-  const transactions = selectData?.rows?._array;
-
-  const isLoading = selectLoading;
-
   const currentConsumerInfo = useMemo(() => {
-    return consumers.find(consumer => consumer.id === consumerId);
-  }, [consumers, consumerId]);
+    return allConsumers.find(consumer => consumer.id === consumerId) || {};
+  }, [allConsumers, consumerId]);
 
-  const getTransactionsByConsumerId = useCallback(() => {
-    selectQuery({
-      query: SELECT_TRANSACTIONS_BY_CONSUMER_ID,
-      params: [consumerId],
-    });
-  }, [selectQuery]);
-
-  useEffect(() => {
-    getTransactionsByConsumerId();
-  }, [getTransactionsByConsumerId]);
-
-  useEffect(() => {
-    if (!isNilOrEmpty(selectError)) {
-      showErrorModal({
-        title: 'Erro ao buscar transações',
-        description: 'Não foi possível carregar as transações deste usuário no momento',
-        buttonText: 'Tentar novamente',
-        onButtonClick: getTransactionsByConsumerId,
-      });
-    }
-  }, [selectError]);
+  const transactions = useMemo(() => {
+    return allTransactions.filter(transaction => transaction.consumerId === consumerId);
+  }, [allTransactions, consumerId]);
 
   function handleAfterTransactionOperation({ addedValue }) {
-
-    if (isNilOrEmpty(currentConsumerInfo)) return;
-
-    const calculatedValue = currentConsumerInfo.balance + addedValue;
-    const finalValue = isNaN(calculatedValue) ? 0 : calculatedValue;
-
-    updateConsumerFromStore({
+    addToBalanceById({
       consumerId,
-      newConsumerName: currentConsumerInfo.name,
-      newConsumerBalance: finalValue,
+      balanceToBeAdded: addedValue,
     });
 
     showFeedbackMessage({
       message: "Saldo do cliente atualizado com sucesso!",
     });
-
-    // refresh transactions list
-    getTransactionsByConsumerId();
   }
 
   return (

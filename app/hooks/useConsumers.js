@@ -74,4 +74,19 @@ export const useConsumers = create((set) => ({
       })
       .finally(() => set({ updateConsumerData: { loading: false } }));
   },
+  addToBalanceById: ({ consumerId, balanceToBeAdded }) => {
+    set((state) => ({
+      consumers: state.consumers.map(c => {
+        if (c.id === consumerId) {
+          return {
+            id: c.id,
+            name: c.name,
+            balance: c.balance + balanceToBeAdded,
+          }
+        } else {
+          return c;
+        }
+      }),
+    }))
+  }
 }));
