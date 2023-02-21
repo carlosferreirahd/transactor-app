@@ -1,9 +1,19 @@
 import { queryRunner } from "./queryRunner";
-import { SELECT_ALL_TRANSACTIONS } from "../utils/queries";
+import {
+  ADD_NEW_TRANSACTION,
+  SELECT_ALL_TRANSACTIONS,
+} from "../utils/queries";
 
-export const fetchAllTransactions = async () => {
+export const fetchAllTransactionsFromDb = async () => {
   return queryRunner({
     query: SELECT_ALL_TRANSACTIONS,
     params: [],
+  });
+}
+
+export const addTransactionToDb = async ({ value, operationTime, consumerId }) => {
+  return queryRunner({
+    query: ADD_NEW_TRANSACTION,
+    params: [value, operationTime, consumerId],
   });
 }

@@ -1,9 +1,5 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useErrorHandler } from '../../hooks/useErrorHandler';
+import React, { useMemo } from 'react';
 import { useFeedbackMessage } from '../../hooks/useFeedbackMessage';
-import { useQuery } from '../../hooks/useQuery';
-import { SELECT_TRANSACTIONS_BY_CONSUMER_ID, UPDATE_CONSUMER } from '../../utils/queries';
-import { isNilOrEmpty } from '../../utils/verifications';
 import { useConsumers } from '../../hooks/useConsumers';
 import { TransactionsDetailsView } from './TransactionsDetailsView';
 import { useTransactions } from '../../hooks/useTransactions';

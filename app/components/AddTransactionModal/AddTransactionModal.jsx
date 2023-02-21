@@ -1,12 +1,11 @@
-import moment from 'moment';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, HelperText, Modal, RadioButton, Text, TextInput } from 'react-native-paper';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
-import { useQuery } from '../../hooks/useQuery';
-import { ADD_NEW_TRANSACTION } from '../../utils/queries';
 import { isNilOrEmpty } from '../../utils/verifications';
 import CurrencyInput from 'react-native-currency-input';
+import moment from 'moment';
+import { useTransactions } from '../../hooks/useTransactions';
 
 export function AddTransactionModal({
   consumerId,
@@ -22,48 +21,11 @@ export function AddTransactionModal({
   const typeHasError = isNilOrEmpty(type);
   const hasErrors = valueHasError || typeHasError;
 
+  const addTransaction = useTransactions((state) => state.addTransaction);
+
+  const { loading: addLoading } = useTransactions((state) => state.addTransactionData);
+
   const showErrorModal = useErrorHandler((state) => state.showErrorModal);
-
-  const {
-    loading: addLoading,
-    error: addError,
-    data: addData,
-    executeQuery: addQuery,
-  } = useQuery();
-
-  const addTransactionByConsumerId = useCallback((transactionValue, transactionType) => {
-    const signedValue = transactionType === "payment" ? Number(transactionValue) * -1 : Number(transactionValue);
-    const finalValue = parseInt(signedValue * 100);
-    const transactionDateTime = moment().format();
-
-    addQuery({
-      query: ADD_NEW_TRANSACTION,
-      params: [finalValue, transactionDateTime, consumerId],
-    });
-  }, [addQuery]);
-
-  useEffect(() => {
-    if (!isNilOrEmpty(addData)) {
-
-      const signedValue = type === "payment" ? Number(value) * -1 : Number(value);
-      const addedValue = parseInt(signedValue * 100);
-
-      if (afterAddTransaction) afterAddTransaction({ addedValue });
-
-      handleHideModal();
-    }
-  }, [addData]);
-
-  useEffect(() => {
-    if (!isNilOrEmpty(addError)) {
-      showErrorModal({
-        title: "Erro ao adicionar transação",
-        description: "Não foi possível adicionar esta transação no momento, tente novamente",
-        buttonText: "Tentar novamente",
-        onButtonClick: () => addTransactionByConsumerId(value),
-      });
-    }
-  }, [addError]);
 
   function handleHideModal() {
     setValue(0);
@@ -72,10 +34,34 @@ export function AddTransactionModal({
     if (hideModal) hideModal();
   }
 
-  function handleButtonClick() {
+  function handleSuccess({ addedValue }) {
+    if (afterAddTransaction) afterAddTransaction({ addedValue });
+
+    handleHideModal();
+  }
+
+  function handleError() {
+    showErrorModal({
+      title: "Erro ao adicionar transação",
+      description: "Não foi possível adicionar esta transação no momento, tente mais tarde",
+      buttonText: "Entendi",
+    });
+  }
+
+  function handleSubmit() {
     if (hasErrors) return;
 
-    addTransactionByConsumerId(value, type);
+    const signedValue = type === "payment" ? Number(value) * -1 : Number(value);
+    const finalValue = parseInt(signedValue * 100);
+    const transactionDateTime = moment().format();
+
+    addTransaction({
+      value: finalValue,
+      operationTime: transactionDateTime,
+      consumerId,
+      onSuccess: () => handleSuccess({ addedValue: finalValue }),
+      onFail: handleError,
+    });
   }
 
   return (
@@ -139,7 +125,7 @@ export function AddTransactionModal({
         mode="contained"
         loading={addLoading}
         disabled={addLoading}
-        onPress={handleButtonClick}
+        onPress={handleSubmit}
         style={[styles.commonGap, styles.submitButton]}
       >
         Adicionar
