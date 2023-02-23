@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ActivityIndicator, HelperText, IconButton, Menu, Text, Tooltip } from 'react-native-paper';
+import {
+  ActivityIndicator,
+  HelperText,
+  IconButton,
+  Menu,
+  Surface,
+  Text,
+  Tooltip,
+} from 'react-native-paper';
 import { AddTransactionModal } from '../../components/AddTransactionModal/AddTransactionModal';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
@@ -45,12 +53,17 @@ export function TransactionsDetailsView({
     }
 
     return (
-      <TransactionsList
-        transactions={transactions}
-        filterType={selectedFilter}
-        canDelete={true}
-        afterDeleteTransaction={handleAfterTransactionOperation}
-      />
+      <Surface
+        style={styles.surfaceContainer}
+        elevation={4}
+      >
+        <TransactionsList
+          transactions={transactions}
+          filterType={selectedFilter}
+          canDelete={true}
+          afterDeleteTransaction={handleAfterTransactionOperation}
+        />
+      </Surface>
     );
   }
 
@@ -130,6 +143,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+  },
+  surfaceContainer: {
+    borderRadius: 8,
   },
   viewLoadingContainer: {
     justifyContent: 'center',

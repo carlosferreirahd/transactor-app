@@ -1,15 +1,13 @@
-import moment from 'moment';
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { Surface } from 'react-native-paper';
+import { ScrollView, StyleSheet } from 'react-native';
 import { isNilOrEmpty } from '../../utils/verifications';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { TransactionsListRow } from './TransactionsListRow';
+import moment from 'moment';
 
 export function TransactionsList({
   transactions,
   filterType,
-  clearBackground = false,
   canDelete = false,
   showConsumerName = false,
   afterDeleteTransaction,
@@ -35,12 +33,13 @@ export function TransactionsList({
         <EmptyState
           description="Nenhuma transação encontrada"
           icon="alert-circle-outline"
+          style={styles.emptyState}
         />
       );
     }
 
     return (
-      <ScrollView style={clearBackground ? styles.clearContainer : {}}>
+      <ScrollView style={styles.scrollerContainer}>
         {filteredTransactions.map(transaction => (
           <TransactionsListRow
             key={transaction.id}
@@ -54,33 +53,14 @@ export function TransactionsList({
     );
   }
 
-  function renderSurfaceList() {
-    return (
-      <Surface
-        style={[styles.surfaceContainer, isNilOrEmpty(filteredTransactions) ? styles.fullContainer : {}]}
-        elevation={4}
-      >
-        {renderList()}
-      </Surface>
-    );
-  }
-
-  return (
-    <View style={styles.fullContainer}>
-      {clearBackground ? renderList() : renderSurfaceList()}
-    </View>
-  );
+  return renderList();
 }
 
 const styles = StyleSheet.create({
-  fullContainer: {
-    flex: 1,
-  },
-  surfaceContainer: {
-    padding: 8,
-    borderRadius: 8,
-  },
-  clearContainer: {
+  scrollerContainer: {
     padding: 16,
-  }
+  },
+  emptyState: {
+    paddingBottom: 100,
+  },
 });

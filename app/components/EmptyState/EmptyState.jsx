@@ -8,10 +8,11 @@ import {
 export function EmptyState({
   icon = '',
   description = '',
+  style,
 }) {
 
   return (
-    <View style={styles.emptyStateContainer}>
+    <View style={[styles.emptyStateContainer, style]}>
       <Avatar.Icon
         icon={icon}
         size={200}
@@ -29,7 +30,6 @@ export function EmptyState({
 
 const styles = StyleSheet.create({
   emptyStateContainer: {
-    flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: 100,

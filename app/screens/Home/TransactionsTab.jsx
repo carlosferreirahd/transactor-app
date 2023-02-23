@@ -41,7 +41,6 @@ export function TransactionsTab() {
         transactions={transactions}
         filterType={filterType}
         canDelete={false}
-        clearBackground
         showConsumerName
       />
       <FilterFab
