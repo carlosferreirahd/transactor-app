@@ -8,6 +8,7 @@ import { useConsumers } from '../../hooks/useConsumers';
 import { formatNumber } from 'react-native-currency-input';
 import { useTransactions } from '../../hooks/useTransactions';
 import moment from 'moment';
+import { DeleteTransactionDialog } from '../DeleteTransactionDialog/DeleteTransactionDialog';
 
 export function TransactionsListRow({
   transaction,
@@ -17,6 +18,8 @@ export function TransactionsListRow({
 }) {
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
 
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -68,12 +71,18 @@ export function TransactionsListRow({
 
   function handleDeleteTransaction() {
     setDeleteLoading(true);
+    setIsDeleteDialogVisible(false);
     removeTransaction({
       id: id,
       onSuccess: handleRemoveSuccess,
       onFail: handleRemoveError,
       onFinally: () => setDeleteLoading(false),
     });
+  }
+
+  function handleDeleteButtonPress() {
+    setIsMenuVisible(false);
+    setIsDeleteDialogVisible(true);
   }
 
   const renderMenu = () => (
@@ -89,7 +98,7 @@ export function TransactionsListRow({
     >
       <Menu.Item
         title="Excluir"
-        onPress={handleDeleteTransaction}
+        onPress={handleDeleteButtonPress}
         leadingIcon="delete"
       />
     </Menu>
@@ -99,9 +108,15 @@ export function TransactionsListRow({
     <ActivityIndicator animating={true} size="small" />
   );
 
+  const renderDelete = () => canDelete ? renderMenu() : null;
+
   function renderRightContent() {
-    return deleteLoading ? renderLoading() : canDelete ? renderMenu() : null;
+    return deleteLoading ? renderLoading() : renderDelete();
   }
+
+  const renderLeftContent = () => (
+    <List.Icon color="#5bc100" icon="currency-brl" />
+  );
 
   const renderDescriptionContent = () => (
     <>
@@ -111,22 +126,30 @@ export function TransactionsListRow({
   );
 
   return (
-    <List.Item
-      title={
-        <View style={styles.titleContainer}>
-          <Text
-            variant="titleLarge"
-            style={styles.titleText}
-          >
-            {formattedValue}
-          </Text>
-          <TransactionTypeTag type={value < 0.0 ? "payment" : "purchase"} />
-        </View>
-      }
-      description={() => renderDescriptionContent()}
-      left={() => <List.Icon color="#5bc100" icon="currency-brl" />}
-      right={() => renderRightContent()}
-    />
+    <>
+      <List.Item
+        title={
+          <View style={styles.titleContainer}>
+            <Text
+              variant="titleLarge"
+              style={styles.titleText}
+            >
+              {formattedValue}
+            </Text>
+            <TransactionTypeTag type={value < 0.0 ? "payment" : "purchase"} />
+          </View>
+        }
+        description={() => renderDescriptionContent()}
+        left={() => renderLeftContent()}
+        right={() => renderRightContent()}
+      />
+      <DeleteTransactionDialog
+        visible={isDeleteDialogVisible}
+        loading={deleteLoading}
+        onOk={handleDeleteTransaction}
+        onDismiss={() => setIsDeleteDialogVisible(false)}
+      />
+    </>
   );
 }
 
