@@ -3,14 +3,15 @@ import { StyleSheet } from 'react-native';
 import { FAB } from 'react-native-paper';
 
 export function Fab({
+  icon,
   onPress,
 }) {
 
   return (
     <FAB
-      icon="plus"
-      style={styles.fab}
+      icon={icon}
       onPress={onPress}
+      style={styles.fab}
     />
   );
 }

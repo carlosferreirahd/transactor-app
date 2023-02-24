@@ -29,7 +29,10 @@ export function ConsumersTab({
   return (
     <View style={styles.viewContainer}>
       {isNilOrEmpty(consumers) ? renderEmptyState() : renderConsumersList()}
-      <Fab onPress={() => navigation.navigate("AddUpdateConsumer")} />
+      <Fab
+        icon="plus"
+        onPress={() => navigation.navigate("AddUpdateConsumer")}
+      />
     </View>
   );
 }

@@ -1,52 +1,46 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { FilterFab } from '../../components/FilterFab/FilterFab';
+import { SegmentedButtons } from 'react-native-paper';
 import { TransactionsList } from '../../components/TransactionsList/TransactionsList';
 import { useTransactions } from '../../hooks/useTransactions';
 
 export function TransactionsTab() {
 
-  const [isFilterFabOpen, setIsFilterFabOpen] = useState({ open: false });
-
-  const onStateChange = ({ open }) => setIsFilterFabOpen({ open });
-
   const [filterType, setFilterType] = useState('all');
 
   const transactions = useTransactions((state) => state.transactions);
 
-  const filterActions = [
+  const buttonsConfig = [
     {
-      icon: filterType === 'all' ? 'check' : 'currency-brl',
+      value: 'all',
       label: 'Todas',
-      size: 'medium',
-      onPress: () => setFilterType('all'),
+      icon: filterType === 'all' ? 'check' : null,
     },
     {
-      icon: filterType === 'payments' ? 'check' : 'currency-brl',
-      label: 'Pagamentos',
-      size: 'medium',
-      onPress: () => setFilterType('payments'),
-    },
-    {
-      icon: filterType === 'purchases' ? 'check' : 'currency-brl',
+      value: 'purchases',
       label: 'Compras',
-      size: 'medium',
-      onPress: () => setFilterType('purchases'),
+      icon: filterType === 'purchases' ? 'check' : null,
     },
+    {
+      value: 'payments',
+      label: 'Pagamentos',
+      icon: filterType === 'payments' ? 'check' : null,
+    }
   ];
 
   return (
     <View style={styles.viewContainer}>
+      <SegmentedButtons
+        value={filterType}
+        onValueChange={setFilterType}
+        buttons={buttonsConfig}
+        style={styles.segmentedButtons}
+      />
       <TransactionsList
         transactions={transactions}
         filterType={filterType}
         canDelete={false}
         showConsumerName
-      />
-      <FilterFab
-        isOpen={isFilterFabOpen.open}
-        actions={filterActions}
-        onStateChange={onStateChange}
       />
     </View>
   );
@@ -59,5 +53,11 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
+  },
+  segmentedButtons: {
+    paddingTop: 24,
+    paddingBottom: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
   }
 });

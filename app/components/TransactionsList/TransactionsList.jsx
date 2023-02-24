@@ -39,7 +39,10 @@ export function TransactionsList({
     }
 
     return (
-      <ScrollView style={styles.scrollerContainer}>
+      <ScrollView
+        style={styles.scrollerContainer}
+        contentContainerStyle={styles.scrollerContentContainer}
+      >
         {filteredTransactions.map(transaction => (
           <TransactionsListRow
             key={transaction.id}
@@ -58,7 +61,12 @@ export function TransactionsList({
 
 const styles = StyleSheet.create({
   scrollerContainer: {
-    padding: 16,
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  scrollerContentContainer: {
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   emptyState: {
     paddingBottom: 100,
